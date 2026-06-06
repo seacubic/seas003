@@ -233,6 +233,133 @@ if (hasGenerator) {
   copyBtn.addEventListener("click", copyTickets);
   clearBtn.addEventListener("click", clearTickets);
 }
+
+// --- View Switching & Charts ---
+
+function showView(viewId) {
+  document.querySelectorAll(".view-section").forEach((view) => view.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach((btn) => {
+    btn.classList.remove("primary-action", "active");
+    btn.classList.add("secondary-action");
+  });
+
+  const selectedView = document.getElementById(viewId + "View");
+  selectedView.classList.add("active");
+  
+  // Find and activate the nav button
+  const btn = Array.from(document.querySelectorAll(".nav-btn")).find(b => b.textContent.includes(viewId === 'generator' ? '번호 생성' : '데이터 분석'));
+  if (btn) {
+    btn.classList.remove("secondary-action");
+    btn.classList.add("primary-action", "active");
+  }
+
+  if (viewId === "dashboard") {
+    initCharts();
+  }
+}
+
+function showChartTab(event, tabId) {
+  document.querySelectorAll(".tab-content").forEach((tab) => tab.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach((btn) => {
+    btn.classList.remove("primary-action", "active");
+    btn.classList.add("secondary-action");
+  });
+
+  document.getElementById(tabId).classList.add("active");
+  event.currentTarget.classList.remove("secondary-action");
+  event.currentTarget.classList.add("primary-action", "active");
+}
+
+let chartsInitialized = false;
+function initCharts() {
+  if (chartsInitialized) return;
+  chartsInitialized = true;
+
+  Chart.defaults.color = "#9db2bd";
+  Chart.defaults.font.family = "system-ui, sans-serif";
+
+  // 번호 빈도
+  new Chart(document.getElementById("freqChart"), {
+    type: "bar",
+    data: {
+      labels: ["14", "17", "4", "9", "13", "2", "1", "45"],
+      datasets: [
+        {
+          label: "출현 횟수",
+          data: [178, 175, 172, 172, 172, 152, 155, 155],
+          backgroundColor: ["#53e3ff", "#53e3ff", "#53e3ff", "#53e3ff", "#53e3ff", "#ff5ca8", "#ff5ca8", "#ff5ca8"],
+          borderRadius: 4,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true, grid: { color: "rgba(255,255,255,0.05)" } },
+        x: { grid: { display: false } },
+      },
+    },
+  });
+
+  // 구간 분석
+  new Chart(document.getElementById("rangeChart"), {
+    type: "pie",
+    data: {
+      labels: ["1~10", "11~20", "21~30", "31~40", "41~45"],
+      datasets: [
+        {
+          data: [22, 28, 24, 20, 6],
+          backgroundColor: ["#ffd166", "#53e3ff", "#ff5ca8", "#b7ff5a", "#9db2bd"],
+          borderWidth: 0,
+        },
+      ],
+    },
+    options: { responsive: true },
+  });
+
+  // 홀짝 비율
+  new Chart(document.getElementById("oddEvenChart"), {
+    type: "doughnut",
+    data: {
+      labels: ["홀3짝3", "홀2짝4", "홀4짝2", "올홀수", "올짝수"],
+      datasets: [
+        {
+          data: [31, 26, 25, 9, 9],
+          backgroundColor: ["#53e3ff", "#3b82f6", "#ff5ca8", "#b7ff5a", "#ffd166"],
+          borderWidth: 0,
+        },
+      ],
+    },
+    options: { responsive: true, cutout: "70%" },
+  });
+
+  // 합계 분석
+  new Chart(document.getElementById("sumChart"), {
+    type: "line",
+    data: {
+      labels: ["~80", "81~120", "121~160", "161~200", "201~"],
+      datasets: [
+        {
+          label: "출현 비율 (%)",
+          data: [3, 24, 49, 21, 3],
+          borderColor: "#53e3ff",
+          backgroundColor: "rgba(83, 227, 255, 0.1)",
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: "#b7ff5a",
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true, grid: { color: "rgba(255,255,255,0.05)" } },
+        x: { grid: { color: "rgba(255,255,255,0.05)" } },
+      },
+    },
+  });
+}
+
 window.addEventListener("resize", resizeCanvas);
 window.visualViewport?.addEventListener("resize", resizeCanvas);
 window.addEventListener("orientationchange", () => {
