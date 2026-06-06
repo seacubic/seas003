@@ -255,7 +255,7 @@ h2 {
 }
 
 .ball.bonus::after {
-  content: "B";
+  content: "행";
   position: absolute;
   right: -4px;
   bottom: -5px;
