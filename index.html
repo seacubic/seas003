@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>로또 그리고</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <canvas id="spaceCanvas" aria-hidden="true"></canvas>
+
+    <main class="app-shell">
+      <section class="generator-panel" aria-labelledby="pageTitle">
+        <div class="panel-top">
+          <div>
+            <p class="eyebrow">Lucky Orbit</p>
+            <h1 id="pageTitle">로또 그리고</h1>
+          </div>
+          <div class="draw-count" aria-live="polite">
+            <span id="drawCount">0</span>
+            <small>생성</small>
+          </div>
+        </div>
+
+        <div class="control-strip" aria-label="생성 옵션">
+          <label class="control">
+            <span>게임 수</span>
+            <select id="setCount">
+              <option value="1">1게임</option>
+              <option value="3" selected>3게임</option>
+              <option value="5">5게임</option>
+              <option value="10">10게임</option>
+            </select>
+          </label>
+
+          <label class="control">
+            <span>번호 고정</span>
+            <input id="fixedNumbers" type="text" inputmode="numeric" placeholder="예: 7, 18">
+          </label>
+
+          <label class="toggle">
+            <input id="includeBonus" type="checkbox" checked>
+            <span>보너스 포함</span>
+          </label>
+        </div>
+
+        <div id="resultGrid" class="result-grid" aria-live="polite"></div>
+
+        <div class="actions">
+          <button id="generateBtn" class="primary-action" type="button">
+            <span class="icon">✦</span>
+            번호 생성
+          </button>
+          <button id="copyBtn" class="secondary-action" type="button">
+            복사
+          </button>
+          <button id="clearBtn" class="ghost-action" type="button">
+            초기화
+          </button>
+        </div>
+      </section>
+
+      <aside class="history-panel" aria-labelledby="historyTitle">
+        <div class="history-header">
+          <div>
+            <p class="eyebrow">Archive</p>
+            <h2 id="historyTitle">최근 생성 기록</h2>
+          </div>
+          <span id="statusText">준비됨</span>
+        </div>
+        <ol id="historyList" class="history-list"></ol>
+      </aside>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
