@@ -130,14 +130,19 @@ function renderTickets() {
   resultGrid.innerHTML = tickets
     .map((ticket, index) => {
       const balls = ticket.main
-        .map((num) => `<span class="ball ${ballClass(num)}">${num}</span>`)
+        .map((num, ballIndex) => {
+          const delay = index * 90 + ballIndex * 80;
+          return `<span class="ball ${ballClass(num)}" style="--delay: ${delay}ms">${num}</span>`;
+        })
         .join("");
       const bonus = ticket.bonus
-        ? `<span class="ball bonus ${ballClass(ticket.bonus)}">${ticket.bonus}</span>`
+        ? `<span class="ball bonus ${ballClass(ticket.bonus)}" style="--delay: ${
+            index * 90 + MAIN_NUMBER_COUNT * 80
+          }ms">${ticket.bonus}</span>`
         : "";
 
       return `
-        <article class="ticket">
+        <article class="ticket" style="--delay: ${index * 70}ms">
           <div class="ticket-index">${String(index + 1).padStart(2, "0")}</div>
           <div class="numbers">${balls}${bonus}</div>
         </article>
