@@ -29,6 +29,33 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: -20vh -20vw;
+  z-index: 0;
+  pointer-events: none;
+  background-repeat: repeat;
+  will-change: transform;
+}
+
+body::before {
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(83, 227, 255, 0.72) 0 1px, transparent 1.7px);
+  background-size: 78px 78px, 132px 132px;
+  animation: starDrift 18s linear infinite;
+}
+
+body::after {
+  background-image:
+    radial-gradient(circle, rgba(183, 255, 90, 0.58) 0 1px, transparent 1.8px),
+    radial-gradient(circle, rgba(255, 92, 168, 0.44) 0 1px, transparent 1.8px);
+  background-size: 118px 118px, 174px 174px;
+  animation: starDriftAlt 27s linear infinite;
+}
+
 button,
 input,
 select {
@@ -40,12 +67,13 @@ select {
   inset: 0;
   width: 100%;
   height: 100%;
-  z-index: 0;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .app-shell {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
   gap: 22px;
@@ -54,6 +82,26 @@ select {
   margin: 0 auto;
   padding: 32px 0;
   align-items: center;
+}
+
+@keyframes starDrift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(72px, -112px, 0);
+  }
+}
+
+@keyframes starDriftAlt {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-96px, -150px, 0);
+  }
 }
 
 .generator-panel,
@@ -365,16 +413,34 @@ button:hover {
   }
 
   .ticket {
-    grid-template-columns: 1fr;
+    grid-template-columns: clamp(26px, 8vw, 32px) minmax(0, 1fr);
+    gap: 6px;
+    min-height: 52px;
+    padding: 10px;
   }
 
   .ticket-index {
-    width: auto;
-    min-height: 32px;
+    width: clamp(26px, 8vw, 32px);
+    min-height: clamp(26px, 8vw, 32px);
+    font-size: 0.72rem;
+  }
+
+  .numbers {
+    flex-wrap: nowrap;
+    gap: clamp(4px, 1.4vw, 7px);
+    min-width: 0;
   }
 
   .ball {
-    width: 39px;
+    width: clamp(29px, 9vw, 36px);
+    font-size: clamp(0.76rem, 2.8vw, 0.92rem);
+  }
+
+  .ball.bonus::after {
+    right: -3px;
+    bottom: -4px;
+    width: 15px;
+    font-size: 0.56rem;
   }
 
   button {

@@ -1,9 +1,10 @@
 const MAX_NUMBER = 45;
 const MAIN_NUMBER_COUNT = 6;
 const HISTORY_LIMIT = 8;
+const MAX_CANVAS_DPR = 2;
 
 const canvas = document.getElementById("spaceCanvas");
-const ctx = canvas.getContext("2d");
+const ctx = canvas?.getContext("2d");
 const resultGrid = document.getElementById("resultGrid");
 const historyList = document.getElementById("historyList");
 const drawCountEl = document.getElementById("drawCount");
@@ -19,39 +20,64 @@ let tickets = [];
 let history = [];
 let drawCount = 0;
 let particles = [];
+let viewportWidth = 0;
+let viewportHeight = 0;
+let lastFrame = 0;
+let animationFrameId = null;
+
+function getViewportSize() {
+  const viewport = window.visualViewport;
+  return {
+    width: Math.ceil(viewport?.width || window.innerWidth || document.documentElement.clientWidth),
+    height: Math.ceil(viewport?.height || window.innerHeight || document.documentElement.clientHeight),
+  };
+}
 
 function resizeCanvas() {
-  const scale = window.devicePixelRatio || 1;
-  canvas.width = Math.floor(window.innerWidth * scale);
-  canvas.height = Math.floor(window.innerHeight * scale);
-  canvas.style.width = `${window.innerWidth}px`;
-  canvas.style.height = `${window.innerHeight}px`;
+  if (!canvas || !ctx) return;
+
+  const size = getViewportSize();
+  viewportWidth = size.width;
+  viewportHeight = size.height;
+  const scale = Math.min(window.devicePixelRatio || 1, MAX_CANVAS_DPR);
+
+  canvas.width = Math.max(1, Math.floor(viewportWidth * scale));
+  canvas.height = Math.max(1, Math.floor(viewportHeight * scale));
+  canvas.style.width = `${viewportWidth}px`;
+  canvas.style.height = `${viewportHeight}px`;
   ctx.setTransform(scale, 0, 0, scale, 0, 0);
   createParticles();
 }
 
 function createParticles() {
-  const count = Math.min(130, Math.floor((window.innerWidth * window.innerHeight) / 9000));
+  const area = viewportWidth * viewportHeight;
+  const count = Math.max(38, Math.min(120, Math.floor(area / 11000)));
+
   particles = Array.from({ length: count }, () => ({
-    x: Math.random() * window.innerWidth,
-    y: Math.random() * window.innerHeight,
+    x: Math.random() * viewportWidth,
+    y: Math.random() * viewportHeight,
     size: Math.random() * 2.4 + 0.8,
-    speed: Math.random() * 0.55 + 0.15,
+    speed: Math.random() * 28 + 12,
     hue: Math.random() > 0.52 ? 188 : 82,
   }));
 }
 
-function drawSpace() {
-  ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+function drawSpace(timestamp = 0) {
+  if (!ctx) return;
+
+  const delta = Math.min(48, timestamp - lastFrame || 16) / 1000;
+  lastFrame = timestamp;
+
+  ctx.clearRect(0, 0, viewportWidth, viewportHeight);
   ctx.globalCompositeOperation = "lighter";
 
   particles.forEach((dot, index) => {
-    dot.y -= dot.speed;
-    dot.x += Math.sin((Date.now() / 900 + index) * 0.8) * 0.18;
+    dot.y -= dot.speed * delta;
+    dot.x += Math.sin((timestamp / 900 + index) * 0.8) * 14 * delta;
 
     if (dot.y < -8) {
-      dot.y = window.innerHeight + 8;
-      dot.x = Math.random() * window.innerWidth;
+      dot.y = viewportHeight + 8;
+      dot.x = Math.random() * viewportWidth;
     }
 
     ctx.beginPath();
@@ -61,7 +87,7 @@ function drawSpace() {
   });
 
   ctx.globalCompositeOperation = "source-over";
-  requestAnimationFrame(drawSpace);
+  animationFrameId = requestAnimationFrame(drawSpace);
 }
 
 function parseFixedNumbers() {
@@ -187,7 +213,23 @@ generateBtn.addEventListener("click", generateTickets);
 copyBtn.addEventListener("click", copyTickets);
 clearBtn.addEventListener("click", clearTickets);
 window.addEventListener("resize", resizeCanvas);
+window.visualViewport?.addEventListener("resize", resizeCanvas);
+window.addEventListener("orientationchange", () => {
+  window.setTimeout(resizeCanvas, 250);
+});
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && animationFrameId) {
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
+    return;
+  }
+
+  if (!document.hidden && !animationFrameId) {
+    lastFrame = 0;
+    animationFrameId = requestAnimationFrame(drawSpace);
+  }
+});
 
 resizeCanvas();
-drawSpace();
+animationFrameId = requestAnimationFrame(drawSpace);
 generateTickets();
