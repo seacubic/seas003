@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="title desc">
+  <title id="title">역대 최다 당첨 기록</title>
+  <desc id="desc">유리 패널 위에 로또 공과 50이라는 숫자가 빛나는 미래적인 이미지</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#102032"/>
+      <stop offset="0.52" stop-color="#08111c"/>
+      <stop offset="1" stop-color="#17261d"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" x2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".28"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity=".06"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="640" height="420" rx="30" fill="url(#bg)"/>
+  <g opacity=".7">
+    <circle cx="96" cy="78" r="2" fill="#fff"/>
+    <circle cx="532" cy="92" r="2.8" fill="#53e3ff"/>
+    <circle cx="474" cy="312" r="2" fill="#b7ff5a"/>
+    <circle cx="142" cy="344" r="1.7" fill="#ff5ca8"/>
+    <path d="M88 210h464M320 46v328" stroke="#53e3ff" stroke-opacity=".16"/>
+  </g>
+  <rect x="72" y="68" width="496" height="284" rx="24" fill="url(#glass)" stroke="#fff" stroke-opacity=".24"/>
+  <text x="112" y="144" fill="#9db2bd" font-family="Arial, sans-serif" font-size="24" font-weight="700">LOTTO STORY</text>
+  <text x="112" y="246" fill="#f3fbff" font-family="Arial, sans-serif" font-size="112" font-weight="800" filter="url(#glow)">50</text>
+  <text x="278" y="231" fill="#53e3ff" font-family="Arial, sans-serif" font-size="40" font-weight="800">WINNERS</text>
+  <g transform="translate(388 184)">
+    <circle cx="0" cy="0" r="48" fill="#ffd166"/>
+    <circle cx="72" cy="34" r="40" fill="#53e3ff"/>
+    <circle cx="6" cy="86" r="34" fill="#b7ff5a"/>
+    <text x="-16" y="13" fill="#071017" font-family="Arial" font-size="34" font-weight="800">1</text>
+    <text x="55" y="45" fill="#071017" font-family="Arial" font-size="28" font-weight="800">9</text>
+    <text x="-12" y="96" fill="#071017" font-family="Arial" font-size="24" font-weight="800">50</text>
+  </g>
+</svg>

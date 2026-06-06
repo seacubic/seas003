@@ -15,6 +15,18 @@ const includeBonusInput = document.getElementById("includeBonus");
 const generateBtn = document.getElementById("generateBtn");
 const copyBtn = document.getElementById("copyBtn");
 const clearBtn = document.getElementById("clearBtn");
+const hasGenerator = Boolean(
+  resultGrid &&
+    historyList &&
+    drawCountEl &&
+    statusText &&
+    setCountInput &&
+    fixedNumbersInput &&
+    includeBonusInput &&
+    generateBtn &&
+    copyBtn &&
+    clearBtn
+);
 
 let tickets = [];
 let history = [];
@@ -91,6 +103,8 @@ function drawSpace(timestamp = 0) {
 }
 
 function parseFixedNumbers() {
+  if (!fixedNumbersInput) return [];
+
   const raw = fixedNumbersInput.value
     .split(/[,\s]+/)
     .map((value) => Number(value.trim()))
@@ -115,7 +129,7 @@ function createTicket() {
   const fixed = parseFixedNumbers();
   const main = [...fixed, ...randomUniqueNumbers(MAIN_NUMBER_COUNT - fixed.length, fixed)]
     .sort((a, b) => a - b);
-  const bonus = includeBonusInput.checked ? randomUniqueNumbers(1, main)[0] : null;
+  const bonus = includeBonusInput?.checked ? randomUniqueNumbers(1, main)[0] : null;
   return { main, bonus };
 }
 
@@ -214,9 +228,11 @@ function clearTickets() {
   statusText.textContent = "초기화됨";
 }
 
-generateBtn.addEventListener("click", generateTickets);
-copyBtn.addEventListener("click", copyTickets);
-clearBtn.addEventListener("click", clearTickets);
+if (hasGenerator) {
+  generateBtn.addEventListener("click", generateTickets);
+  copyBtn.addEventListener("click", copyTickets);
+  clearBtn.addEventListener("click", clearTickets);
+}
 window.addEventListener("resize", resizeCanvas);
 window.visualViewport?.addEventListener("resize", resizeCanvas);
 window.addEventListener("orientationchange", () => {
@@ -237,4 +253,7 @@ document.addEventListener("visibilitychange", () => {
 
 resizeCanvas();
 animationFrameId = requestAnimationFrame(drawSpace);
-generateTickets();
+
+if (hasGenerator) {
+  generateTickets();
+}

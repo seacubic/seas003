@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="title desc">
+  <title id="title">세계의 로또 이야기</title>
+  <desc id="desc">지구와 날짜 숫자가 빛나는 세계 로또 이야기 이미지</desc>
+  <defs>
+    <radialGradient id="planet" cx=".38" cy=".34" r=".74">
+      <stop offset="0" stop-color="#b7ff5a"/>
+      <stop offset=".45" stop-color="#53e3ff"/>
+      <stop offset="1" stop-color="#2b3a67"/>
+    </radialGradient>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#071017"/>
+      <stop offset=".6" stop-color="#111827"/>
+      <stop offset="1" stop-color="#23102a"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="420" rx="30" fill="url(#bg)"/>
+  <g opacity=".68" fill="#fff">
+    <circle cx="86" cy="86" r="2"/>
+    <circle cx="552" cy="74" r="2.4"/>
+    <circle cx="502" cy="332" r="1.8"/>
+    <circle cx="124" cy="344" r="2.2"/>
+  </g>
+  <circle cx="298" cy="214" r="112" fill="url(#planet)"/>
+  <path d="M210 186c58 26 122 24 176-6M224 250c48-18 94-18 148 4M286 106c-18 70-16 146 8 214M332 112c36 60 38 130 10 206" fill="none" stroke="#071017" stroke-opacity=".34" stroke-width="10" stroke-linecap="round"/>
+  <path d="M116 214c98-88 284-102 408 0-118 72-286 82-408 0Z" fill="none" stroke="#53e3ff" stroke-opacity=".42" stroke-width="4"/>
+  <rect x="394" y="92" width="146" height="88" rx="16" fill="#fff" fill-opacity=".12" stroke="#fff" stroke-opacity=".24"/>
+  <text x="466" y="130" text-anchor="middle" fill="#f3fbff" font-family="Arial" font-size="34" font-weight="800">9/11</text>
+  <text x="466" y="156" text-anchor="middle" fill="#9db2bd" font-family="Arial" font-size="15">NEW YORK</text>
+  <rect x="96" y="286" width="170" height="72" rx="16" fill="#fff" fill-opacity=".12" stroke="#fff" stroke-opacity=".24"/>
+  <text x="181" y="330" text-anchor="middle" fill="#f3fbff" font-family="Arial" font-size="28" font-weight="800">4 15 23</text>
+</svg>

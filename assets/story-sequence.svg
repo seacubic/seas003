@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="title desc">
+  <title id="title">연속 번호와 평행이론</title>
+  <desc id="desc">로또 공들이 궤도 위에 나란히 배열된 이미지</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#141018"/>
+      <stop offset=".5" stop-color="#08111c"/>
+      <stop offset="1" stop-color="#102032"/>
+    </linearGradient>
+    <filter id="soft">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+  </defs>
+  <rect width="640" height="420" rx="30" fill="url(#bg)"/>
+  <ellipse cx="320" cy="218" rx="236" ry="96" fill="none" stroke="#53e3ff" stroke-opacity=".32" stroke-width="3"/>
+  <ellipse cx="320" cy="218" rx="276" ry="122" fill="none" stroke="#ff5ca8" stroke-opacity=".18" stroke-width="2"/>
+  <circle cx="318" cy="218" r="124" fill="#53e3ff" opacity=".14" filter="url(#soft)"/>
+  <g font-family="Arial, sans-serif" font-weight="800" font-size="34" text-anchor="middle">
+    <g transform="translate(128 210)"><circle r="40" fill="#ffd166"/><text y="12" fill="#071017">1</text></g>
+    <g transform="translate(206 176)"><circle r="40" fill="#53e3ff"/><text y="12" fill="#071017">2</text></g>
+    <g transform="translate(284 164)"><circle r="40" fill="#ff5ca8"/><text y="12" fill="#071017">3</text></g>
+    <g transform="translate(362 176)"><circle r="40" fill="#b7ff5a"/><text y="12" fill="#071017">4</text></g>
+    <g transform="translate(440 210)"><circle r="40" fill="#ffd166"/><text y="12" fill="#071017">5</text></g>
+    <g transform="translate(512 260)"><circle r="40" fill="#53e3ff"/><text y="12" fill="#071017">6</text></g>
+  </g>
+  <text x="72" y="78" fill="#f3fbff" font-family="Arial, sans-serif" font-size="34" font-weight="800">NUMBER ORBIT</text>
+  <text x="74" y="112" fill="#9db2bd" font-family="Arial, sans-serif" font-size="18">sequence, coincidence, parallel draw</text>
+</svg>
