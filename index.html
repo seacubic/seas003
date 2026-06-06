@@ -82,40 +82,41 @@
             <p class="eyebrow">Lucky Orbit</p>
             <h1 id="pageTitle">로또 그리고</h1>
           </div>
-          <div class="draw-count" aria-live="polite">
-            <span id="drawCount">0</span>
-            <small>생성</small>
-          </div>
         </div>
 
         <div class="control-strip" aria-label="생성 옵션">
-          <label class="control">
-            <span>게임 수</span>
-            <select id="setCount">
-              <option value="1">1게임</option>
-              <option value="3" selected>3게임</option>
-              <option value="5">5게임</option>
-              <option value="10">10게임</option>
-            </select>
-          </label>
+          <div style="display: flex; gap: 14px; flex-wrap: wrap; width: 100%;">
+            <label class="control" style="flex: 0 1 120px;">
+              <span>게임 수</span>
+              <select id="setCount">
+                <option value="1">1게임</option>
+                <option value="3" selected>3게임</option>
+                <option value="5">5게임</option>
+                <option value="10">10게임</option>
+              </select>
+            </label>
 
-          <label class="control">
-            <span>번호 고정</span>
-            <input id="fixedNumbers" type="text" inputmode="numeric" placeholder="예: 7, 18">
-          </label>
+            <label class="control" style="flex: 1 1 240px;">
+              <span>고정 번호 (최대 7개)</span>
+              <input id="fixedNumbers" type="text" inputmode="numeric" placeholder="예: 7, 18, 22, 38">
+            </label>
 
-          <label class="toggle">
-            <input id="includeBonus" type="checkbox" checked>
-            <span>행운의 숫자</span>
-          </label>
+            <label class="toggle" style="flex: 0 0 auto; align-self: flex-end; margin-bottom: 0;">
+              <input id="includeBonus" type="checkbox" checked>
+              <span>보너스 포함</span>
+            </label>
+          </div>
         </div>
 
         <div id="resultGrid" class="result-grid" aria-live="polite"></div>
 
         <div class="actions">
-          <button id="generateBtn" class="primary-action" type="button">
-            <span class="icon">✦</span>
-            번호 생성
+          <button id="generateBtn" class="primary-action" type="button" style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+            <span><span class="icon">✦</span>번호 생성</span>
+            <div style="padding-left: 12px; border-left: 1px solid rgba(7, 16, 23, 0.2); display: flex; flex-direction: column; align-items: center;">
+              <span id="drawCount" style="font-size: 1.1rem; line-height: 1;">0</span>
+              <small style="font-size: 0.6rem; opacity: 0.7;">TOTAL</small>
+            </div>
           </button>
           <a class="secondary-action link-action" href="stories.html">이야기</a>
           <button id="copyBtn" class="secondary-action" type="button">

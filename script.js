@@ -109,7 +109,7 @@ function parseFixedNumbers() {
     .split(/[,\s]+/)
     .map((value) => Number(value.trim()))
     .filter(Number.isInteger);
-  return [...new Set(raw)].filter((num) => num >= 1 && num <= MAX_NUMBER).slice(0, MAIN_NUMBER_COUNT);
+  return [...new Set(raw)].filter((num) => num >= 1 && num <= MAX_NUMBER).slice(0, 7);
 }
 
 function randomUniqueNumbers(count, excluded = []) {
@@ -127,9 +127,18 @@ function randomUniqueNumbers(count, excluded = []) {
 
 function createTicket() {
   const fixed = parseFixedNumbers();
-  const main = [...fixed, ...randomUniqueNumbers(MAIN_NUMBER_COUNT - fixed.length, fixed)]
+  const fixedMain = fixed.slice(0, MAIN_NUMBER_COUNT);
+  const main = [...fixedMain, ...randomUniqueNumbers(MAIN_NUMBER_COUNT - fixedMain.length, fixedMain)]
     .sort((a, b) => a - b);
-  const bonus = includeBonusInput?.checked ? randomUniqueNumbers(1, main)[0] : null;
+  
+  let bonus = null;
+  if (includeBonusInput?.checked) {
+    if (fixed.length >= 7 && !main.includes(fixed[6])) {
+      bonus = fixed[6];
+    } else {
+      bonus = randomUniqueNumbers(1, main)[0];
+    }
+  }
   return { main, bonus };
 }
 
