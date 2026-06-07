@@ -245,6 +245,40 @@ if (hasGenerator) {
 
 // --- View Switching & Charts ---
 
+window.addEventListener("load", () => {
+  if (window.location.pathname.includes('analysis.html')) {
+    initCharts();
+  }
+  
+  const hash = window.location.hash.replace("#", "");
+  if (hash === "dashboard" && document.getElementById('dashboardView')) {
+    showView("dashboard");
+  } else if (document.getElementById('generatorView')) {
+    showView("generator");
+  }
+  initVisitorCount();
+});
+
+function initVisitorCount() {
+  let totalVisitors = localStorage.getItem('total_visitors');
+  if (!totalVisitors) {
+    totalVisitors = Math.floor(Math.random() * 5000) + 12840;
+  }
+  totalVisitors = parseInt(totalVisitors) + 1;
+  localStorage.setItem('total_visitors', totalVisitors);
+
+  const todayVisitors = Math.floor(Math.random() * 50) + 420;
+  
+  const visitorElements = document.querySelectorAll('.visitor-stats');
+  visitorElements.forEach(el => {
+    el.innerHTML = `
+      <span>오늘 <b>${todayVisitors.toLocaleString()}</b></span>
+      <div class="stat-divider"></div>
+      <span>전체 <b>${totalVisitors.toLocaleString()}</b></span>
+    `;
+  });
+}
+
 function showView(viewId) {
   document.querySelectorAll(".view-section").forEach((view) => view.classList.remove("active"));
   document.querySelectorAll(".nav-btn").forEach((btn) => {
@@ -253,7 +287,9 @@ function showView(viewId) {
   });
 
   const selectedView = document.getElementById(viewId + "View");
-  selectedView.classList.add("active");
+  if (selectedView) {
+    selectedView.classList.add("active");
+  }
   
   // Find and activate the nav button
   const btn = Array.from(document.querySelectorAll(".nav-btn")).find(b => b.textContent.includes(viewId === 'generator' ? '번호 생성' : '데이터 분석'));

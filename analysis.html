@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>로또 그리고 | 데이터</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      .dashboard-container {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      .chart-tab-nav {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+      .stat-card {
+        padding: 16px;
+        margin-bottom: 16px;
+        border-radius: 8px;
+        background: rgba(83, 227, 255, 0.08);
+        border: 1px solid rgba(83, 227, 255, 0.15);
+        color: #dcebf0;
+      }
+      .stat-card b { color: var(--cyan); }
+      .chart-wrapper {
+        background: rgba(12, 18, 28, 0.4);
+        padding: 20px;
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+      }
+      .tab-content { display: none; }
+      .tab-content.active { display: block; }
+      .warning-box {
+        margin-top: 24px;
+        padding: 16px;
+        border-radius: 8px;
+        background: rgba(255, 92, 168, 0.1);
+        border: 1px solid rgba(255, 92, 168, 0.24);
+        font-size: 0.85rem;
+        color: #fdd;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="spaceCanvas" aria-hidden="true"></canvas>
+
+    <main class="story-shell">
+      <nav class="app-nav">
+        <a class="nav-btn secondary-action" href="index.html">번호 생성</a>
+        <a class="nav-btn secondary-action" href="dreams.html">꿈 해몽</a>
+        <a class="nav-btn primary-action active" href="analysis.html">데이터 분석</a>
+        <a class="nav-btn secondary-action" href="stories.html">이야기</a>
+        <div class="visitor-stats"></div>
+      </nav>
+
+      <section class="generator-panel">
+        <div class="dashboard-container">
+          <header>
+            <p class="eyebrow">Statistics</p>
+            <h1>데이터 분석</h1>
+            <p style="margin-top: 8px; color: var(--muted); font-size: 0.9rem;">1회 ~ 1226회 당첨 데이터 기반</p>
+          </header>
+
+          <nav class="chart-tab-nav">
+            <button class="tab-btn active primary-action" style="flex: none; min-height: 36px; font-size: 0.85rem;" onclick="showChartTab(event, 'freq')">번호 빈도</button>
+            <button class="tab-btn secondary-action" style="min-height: 36px; font-size: 0.85rem;" onclick="showChartTab(event, 'range')">구간 분석</button>
+            <button class="tab-btn secondary-action" style="min-height: 36px; font-size: 0.85rem;" onclick="showChartTab(event, 'oddEven')">홀짝 비율</button>
+            <button class="tab-btn secondary-action" style="min-height: 36px; font-size: 0.85rem;" onclick="showChartTab(event, 'sum')">합계 분석</button>
+          </nav>
+
+          <div id="freq" class="tab-content active">
+            <div class="stat-card">
+              가장 많이 나온 번호: <b>14번(178회)</b>, 17번(175회)<br>
+              가장 적게 나온 번호: <b>2번(152회)</b>, 1번(155회)
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="freqChart"></canvas>
+            </div>
+          </div>
+
+          <div id="range" class="tab-content">
+            <div class="stat-card">11~20 구간이 가장 높은 빈도로 출현했습니다.</div>
+            <div class="chart-wrapper">
+              <canvas id="rangeChart"></canvas>
+            </div>
+          </div>
+
+          <div id="oddEven" class="tab-content">
+            <div class="stat-card">홀3:짝3 균형 잡힌 조합이 약 31%를 차지합니다.</div>
+            <div class="chart-wrapper" style="max-width: 400px; margin: 0 auto;">
+              <canvas id="oddEvenChart"></canvas>
+            </div>
+          </div>
+
+          <div id="sum" class="tab-content">
+            <div class="stat-card">번호 합계 121~160 구간이 당첨 회차의 약 49%입니다.</div>
+            <div class="chart-wrapper">
+              <canvas id="sumChart"></canvas>
+            </div>
+          </div>
+
+          <div class="warning-box">
+            ⚠️ 통계는 과거의 기록일 뿐, 독립 확률인 다음 회차를 예측하지 않습니다.
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
