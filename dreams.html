@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>로또 그리고 | 꿈 해몽</title>
 <link rel="stylesheet" href="styles.css">
-<script src="https://html2canvas.hertzenberg.com/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap');
 
@@ -193,22 +193,42 @@ textarea#dreamInput:focus {
     transition: 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.dragon-wrap {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 260px;
-}
+.dream-visual {
+        border-radius: 22px;
+        padding: 14px;
+        background:
+            linear-gradient(145deg, rgba(7, 16, 23, 0.95), rgba(15, 23, 42, 0.88)),
+            radial-gradient(circle at top, rgba(125, 211, 252, 0.16), transparent 35%);
+        border: 1px solid rgba(125, 211, 252, 0.18);
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), 0 18px 42px rgba(2, 6, 23, 0.45);
+        min-height: 260px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
 
-.dragon-svg {
-    width: 220px;
-    filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.4));
-    animation: flyDragon 5s ease-in-out infinite;
-}
+    .dream-visual-badge {
+        align-self: flex-start;
+        border-radius: 999px;
+        border: 1px solid rgba(125, 211, 252, 0.25);
+        background: rgba(15, 23, 42, 0.85);
+        color: #d8f5ff;
+        padding: 7px 10px;
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
 
-@keyframes flyDragon {
-    0%, 100% { transform: translateY(0px) rotate(-3deg); }
-    50% { transform: translateY(-20px) rotate(3deg); }
+    .dream-visual-svg {
+        width: 100%;
+        height: auto;
+        filter: drop-shadow(0 0 24px rgba(56, 189, 248, 0.18));
+        animation: digitalFloat 4.4s ease-in-out infinite;
+    }
+
+    @keyframes digitalFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-6px); }
 }
 
 .analysis {
@@ -359,7 +379,7 @@ textarea#dreamInput:focus {
         <div class="panel input-sticky">
             <h2 style="margin-bottom: 20px; font-size: 24px;">🌙 꿈 입력</h2>
             <textarea id="dreamInput" placeholder="예: 새벽에 용이 하늘로 날아갔다. 금빛 하늘이 보였다. 멀리서 파도 소리가 들렸다."></textarea>
-            <button class="oracle-btn" onclick="analyzeDream()">꿈 분석하기</button>
+            <button id="dreamAnalyzeBtn" class="oracle-btn" type="button">꿈 분석하기</button>
         </div>
 
         <div>
@@ -373,16 +393,24 @@ textarea#dreamInput:focus {
 
             <div class="grid">
                 <div class="card">
-                    <h2>🐉 꿈 카드</h2>
-                    <div class="dragon-wrap">
-                        <svg class="dragon-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20 100 Q80 20 140 70 Q180 110 120 150 Q70 180 20 100Z" fill="url(#dragonGrad)"/>
+                    <h2>🌌 미래형 꿈 카드</h2>
+                    <div id="dreamVisual" class="dream-visual" aria-live="polite">
+                        <div class="dream-visual-badge">Future Dream</div>
+                        <svg class="dream-visual-svg" viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                             <defs>
-                                <linearGradient id="dragonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <linearGradient id="dreamGlow" x1="0" x2="1" y1="0" y2="1">
                                     <stop offset="0%" stop-color="#7c3aed"/>
                                     <stop offset="100%" stop-color="#22d3ee"/>
                                 </linearGradient>
                             </defs>
+                            <rect x="6" y="6" width="228" height="168" rx="26" fill="rgba(15,23,42,0.85)" stroke="rgba(125,211,252,0.35)"/>
+                            <path d="M30 130 C70 60, 150 40, 210 80" stroke="url(#dreamGlow)" stroke-width="4" fill="none" stroke-linecap="round"/>
+                            <path d="M42 90 C92 26, 165 24, 198 68" stroke="rgba(192,132,252,0.55)" stroke-width="2.5" fill="none" stroke-dasharray="6 6"/>
+                            <circle cx="66" cy="62" r="10" fill="#53e3ff" opacity="0.9"/>
+                            <circle cx="175" cy="42" r="7" fill="#c084fc" opacity="0.85"/>
+                            <circle cx="145" cy="118" r="14" fill="#a78bfa" opacity="0.8"/>
+                            <rect x="46" y="132" width="148" height="8" rx="4" fill="rgba(148,163,184,0.15)"/>
+                            <rect x="56" y="146" width="96" height="6" rx="3" fill="rgba(56,189,248,0.35)"/>
                         </svg>
                     </div>
                 </div>
@@ -451,8 +479,23 @@ textarea#dreamInput:focus {
     </div>
 </div>
 
+<footer class="page-footer">Site under development</footer>
+
 <script src="script.js"></script>
 <script>
+const dreamInput = document.getElementById('dreamInput');
+const dreamAnalyzeBtn = document.getElementById('dreamAnalyzeBtn');
+
+if (dreamInput && dreamAnalyzeBtn) {
+    dreamAnalyzeBtn.addEventListener('click', analyzeDream);
+    dreamInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            analyzeDream();
+        }
+    });
+}
+
 const symbolDB = {
     // Nature
     "물": { meaning: "무의식·재물 흐름", numbers: [1, 6], ascension: 55, transform: 75, power: 50, luck: 85 },
@@ -660,6 +703,42 @@ function analyzeDream(){
     const code = generateCode(foundSymbols);
     document.getElementById('dreamCode').innerText = code;
 
+    const dreamVisual = document.getElementById('dreamVisual');
+    const palette = [
+        ['#7c3aed', '#22d3ee'],
+        ['#38bdf8', '#a78bfa'],
+        ['#f472b6', '#38bdf8'],
+        ['#facc15', '#38bdf8']
+    ];
+    const accent = palette[(foundSymbols.length + finalNumbers.length) % palette.length];
+    dreamVisual.innerHTML = `
+        <div class="dream-visual-badge">Future Dream</div>
+        <svg class="dream-visual-svg" viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+                <linearGradient id="dreamAccent" x1="0" x2="1" y1="0" y2="1">
+                    <stop offset="0%" stop-color="${accent[0]}"/>
+                    <stop offset="100%" stop-color="${accent[1]}"/>
+                </linearGradient>
+                <radialGradient id="dreamCore" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="rgba(125,211,252,0.95)"/>
+                    <stop offset="100%" stop-color="rgba(15,23,42,0)"/>
+                </radialGradient>
+            </defs>
+            <rect x="6" y="6" width="228" height="168" rx="26" fill="rgba(15,23,42,0.92)" stroke="rgba(148,163,184,0.18)"/>
+            <circle cx="120" cy="86" r="44" fill="url(#dreamCore)" opacity="0.8"/>
+            <path d="M32 130 C72 62, 150 42, 208 82" stroke="url(#dreamAccent)" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <path d="M44 96 C92 34, 170 30, 198 66" stroke="rgba(192,132,252,0.45)" stroke-width="2.5" fill="none" stroke-dasharray="6 6"/>
+            <g opacity="0.95">
+                <circle cx="68" cy="62" r="9" fill="${accent[0]}"/>
+                <circle cx="182" cy="48" r="7" fill="${accent[1]}"/>
+                <circle cx="150" cy="122" r="13" fill="rgba(125,211,252,0.85)"/>
+            </g>
+            <rect x="44" y="134" width="152" height="8" rx="4" fill="rgba(148,163,184,0.12)"/>
+            <rect x="54" y="147" width="92" height="6" rx="3" fill="rgba(56,189,248,0.35)"/>
+            <text x="50%" y="26" text-anchor="middle" fill="rgba(224,242,254,0.9)" font-size="11" font-family="Arial, sans-serif" letter-spacing="2">DIGITAL DREAM</text>
+        </svg>
+    `;
+
     // --- Update Share Card ---
     document.getElementById('shareTitle').innerText = text.split('\n')[0].substring(0, 20) + (text.length > 20 ? '...' : '');
     document.getElementById('shareContent').innerText = text;
@@ -682,6 +761,12 @@ function analyzeDream(){
 
 function downloadResultImage() {
     const card = document.getElementById('shareCard');
+
+    if (!window.html2canvas) {
+        alert('카드 저장 라이브러리를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+        return;
+    }
+
     html2canvas(card, {
         backgroundColor: '#020617',
         scale: 2,

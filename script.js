@@ -271,17 +271,23 @@ if (hasGenerator) {
   drawCount = getStoredDrawCount();
   drawCountEl.textContent = drawCount;
   bgAudio.volume = 0.18;
+  bgAudio.muted = true;
+
+  bgAudio.play().catch(() => {
+    statusText.textContent = "자동 재생이 차단되어 있습니다";
+  });
 
   musicToggleBtn.addEventListener("click", async () => {
     try {
-      if (bgAudio.paused) {
+      if (bgAudio.paused || bgAudio.muted) {
+        bgAudio.muted = false;
         await bgAudio.play();
-        musicToggleBtn.textContent = "🎵 배경음악 끄기";
+        musicToggleBtn.textContent = "♪";
         musicToggleBtn.setAttribute("aria-pressed", "true");
         statusText.textContent = "잔잔한 배경음악 재생 중";
       } else {
         bgAudio.pause();
-        musicToggleBtn.textContent = "🎵 배경음악 켜기";
+        musicToggleBtn.textContent = "♪";
         musicToggleBtn.setAttribute("aria-pressed", "false");
         statusText.textContent = "배경음악 정지";
       }

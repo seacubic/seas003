@@ -25,11 +25,11 @@
         <a href="dreams.html" class="nav-btn secondary-action">꿈 해몽</a>
         <a href="analysis.html" class="nav-btn secondary-action">데이터 분석</a>
         <a href="stories.html" class="nav-btn secondary-action">이야기</a>
-        <button id="musicToggleBtn" class="secondary-action" type="button" aria-pressed="false" style="margin-left: auto;">🎵 배경음악 켜기</button>
+        <button id="musicToggleBtn" class="secondary-action" type="button" aria-pressed="false" title="배경음악 켜기/끄기" style="margin-left: auto; font-size: 0.72rem; line-height: 1; padding: 4px 8px; border-radius: 999px;">♪</button>
         <div class="visitor-stats"></div>
       </nav>
 
-      <audio id="bgAudio" loop preload="auto" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+      <audio id="bgAudio" loop autoplay muted preload="auto" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
 
       <section id="generatorView" class="view-section active generator-panel" aria-labelledby="pageTitle">
         <div class="panel-top">
@@ -93,6 +93,8 @@
         <ol id="historyList" class="history-list"></ol>
       </aside>
     </main>
+
+    <footer class="page-footer">Site under development</footer>
 
     <script src="script.js"></script>
   </body>
