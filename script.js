@@ -16,6 +16,8 @@ const includeBonusInput = document.getElementById("includeBonus");
 const generateBtn = document.getElementById("generateBtn");
 const copyBtn = document.getElementById("copyBtn");
 const clearBtn = document.getElementById("clearBtn");
+const musicToggleBtn = document.getElementById("musicToggleBtn");
+const bgAudio = document.getElementById("bgAudio");
 const hasGenerator = Boolean(
   resultGrid &&
     historyList &&
@@ -26,7 +28,9 @@ const hasGenerator = Boolean(
     includeBonusInput &&
     generateBtn &&
     copyBtn &&
-    clearBtn
+    clearBtn &&
+    musicToggleBtn &&
+    bgAudio
 );
 
 let tickets = [];
@@ -266,6 +270,27 @@ function clearTickets() {
 if (hasGenerator) {
   drawCount = getStoredDrawCount();
   drawCountEl.textContent = drawCount;
+  bgAudio.volume = 0.18;
+
+  musicToggleBtn.addEventListener("click", async () => {
+    try {
+      if (bgAudio.paused) {
+        await bgAudio.play();
+        musicToggleBtn.textContent = "🎵 배경음악 끄기";
+        musicToggleBtn.setAttribute("aria-pressed", "true");
+        statusText.textContent = "잔잔한 배경음악 재생 중";
+      } else {
+        bgAudio.pause();
+        musicToggleBtn.textContent = "🎵 배경음악 켜기";
+        musicToggleBtn.setAttribute("aria-pressed", "false");
+        statusText.textContent = "배경음악 정지";
+      }
+    } catch (error) {
+      statusText.textContent = "음악 재생을 시작할 수 없습니다";
+      console.error(error);
+    }
+  });
+
   generateBtn.addEventListener("click", generateTickets);
   copyBtn.addEventListener("click", copyTickets);
   clearBtn.addEventListener("click", clearTickets);
