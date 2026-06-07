@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>로또 그리고 | 생성</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      .view-section {
+        display: none;
+        animation: ticketReveal 520ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+      }
+      .view-section.active {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="spaceCanvas" aria-hidden="true"></canvas>
+
+    <main class="app-shell">
+      <nav class="app-nav">
+        <a href="index.html" class="nav-btn primary-action active">번호 생성</a>
+        <a href="dreams.html" class="nav-btn secondary-action">꿈 해몽</a>
+        <a href="analysis.html" class="nav-btn secondary-action">데이터 분석</a>
+        <a href="stories.html" class="nav-btn secondary-action">이야기</a>
+        <div class="visitor-stats"></div>
+      </nav>
+
+      <section id="generatorView" class="view-section active generator-panel" aria-labelledby="pageTitle">
+        <div class="panel-top">
+          <div>
+            <p class="eyebrow">Lucky Orbit</p>
+            <h1 id="pageTitle">로또 그리고</h1>
+          </div>
+        </div>
+
+        <div class="control-strip" aria-label="생성 옵션">
+          <div style="display: flex; gap: 14px; flex-wrap: wrap; width: 100%;">
+            <label class="control" style="flex: 0 1 120px;">
+              <span>게임 수</span>
+              <select id="setCount">
+                <option value="1">1게임</option>
+                <option value="3" selected>3게임</option>
+                <option value="5">5게임</option>
+                <option value="10">10게임</option>
+              </select>
+            </label>
+
+            <label class="control" style="flex: 1 1 240px;">
+              <span>고정 번호 (최대 7개)</span>
+              <input id="fixedNumbers" type="text" inputmode="numeric" placeholder="예: 7, 18, 22, 38">
+            </label>
+
+            <label class="toggle" style="flex: 0 0 auto; align-self: flex-end; margin-bottom: 0;">
+              <input id="includeBonus" type="checkbox" checked>
+              <span>행운의수</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="resultGrid" class="result-grid" aria-live="polite"></div>
+
+        <div class="actions">
+          <button id="generateBtn" class="primary-action" type="button" style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+            <span><span class="icon">✦</span>번호 생성</span>
+            <div style="padding-left: 12px; border-left: 1px solid rgba(7, 16, 23, 0.2); display: flex; align-items: center; gap: 6px;">
+              <span id="drawCount" style="font-size: 1.1rem; line-height: 1;">0</span>
+              <small style="font-size: 0.65rem; opacity: 0.7; font-weight: 800; letter-spacing: 0.05em;">TOTAL</small>
+            </div>
+          </button>
+          <button id="copyBtn" class="secondary-action" type="button">
+            복사
+          </button>
+          <button id="clearBtn" class="ghost-action" type="button">
+            초기화
+          </button>
+        </div>
+      </section>
+
+      <aside class="history-panel" aria-labelledby="historyTitle">
+        <div class="history-header">
+          <div>
+            <p class="eyebrow">Archive</p>
+            <h2 id="historyTitle">최근 생성 기록</h2>
+          </div>
+          <span id="statusText">준비됨</span>
+        </div>
+        <ol id="historyList" class="history-list"></ol>
+      </aside>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -429,28 +429,42 @@ button:hover {
 .app-nav,
 .nav-header {
   display: flex;
+  align-items: center;
   gap: 12px;
   margin-bottom: 24px;
   grid-column: 1 / -1;
   justify-content: center;
   flex-wrap: wrap;
+  align-self: start;
 }
 
 .visitor-stats {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 12px;
+  min-height: 40px;
+  padding: 8px 14px;
+  background: rgba(7, 16, 23, 0.68);
+  border: 1px solid rgba(83, 227, 255, 0.22);
   border-radius: 12px;
-  font-size: 0.75rem;
-  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #dcebf0;
   margin-left: 12px;
+  white-space: nowrap;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
 }
 
 .visitor-stats b {
   color: var(--cyan);
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+.visitor-stat-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
 }
 
 .stat-divider {
@@ -472,6 +486,11 @@ button:hover {
   border: 0;
   color: var(--text);
   min-height: 40px;
+}
+
+.app-nav .nav-btn {
+  flex: 0 0 auto;
+  height: 40px;
 }
 
 .nav-btn.active {
@@ -705,6 +724,10 @@ button:hover {
 @media (max-width: 560px) {
   .app-shell {
     width: min(100% - 20px, 1180px);
+  }
+
+  .visitor-stats {
+    margin-left: 0;
   }
 
   .panel-top {

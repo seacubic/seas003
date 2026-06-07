@@ -2,6 +2,7 @@ const MAX_NUMBER = 45;
 const MAIN_NUMBER_COUNT = 6;
 const HISTORY_LIMIT = 8;
 const MAX_CANVAS_DPR = 2;
+const DRAW_COUNT_STORAGE_KEY = "lotto_draw_count";
 
 const canvas = document.getElementById("spaceCanvas");
 const ctx = canvas?.getContext("2d");
@@ -185,6 +186,7 @@ function renderHistory() {
       (entry) => `
         <li>
           <time>${entry.time}</time>
+          <small style="display:block; color: rgba(183,255,90,0.9); margin-bottom: 6px;">총 ${entry.count ?? 0}게임</small>
           ${entry.lines.join("<br>")}
         </li>
       `
@@ -192,12 +194,34 @@ function renderHistory() {
     .join("");
 }
 
+function getStoredDrawCount() {
+  try {
+    return Math.max(0, Number(localStorage.getItem(DRAW_COUNT_STORAGE_KEY) || 0));
+  } catch {
+    return 0;
+  }
+}
+
+function saveDrawCount(value) {
+  try {
+    localStorage.setItem(DRAW_COUNT_STORAGE_KEY, String(Math.max(0, value || 0)));
+  } catch {
+    // Ignore storage failures and keep UI behavior intact.
+  }
+}
+
+function getSelectedGameCount() {
+  const value = Number(setCountInput?.value || 1);
+  return Number.isFinite(value) && value > 0 ? Math.floor(value) : 1;
+}
+
 function generateTickets() {
-  const count = Number(setCountInput.value);
+  const count = getSelectedGameCount();
   tickets = Array.from({ length: count }, createTicket);
-  drawCount += count;
+  drawCount = getStoredDrawCount() + count;
+  saveDrawCount(drawCount);
   drawCountEl.textContent = drawCount;
-  statusText.textContent = `${count}게임 생성됨`;
+  statusText.textContent = `이번에 ${count}게임 생성 / 누적 ${drawCount}게임`;
   renderTickets();
 
   history.unshift({
@@ -206,6 +230,7 @@ function generateTickets() {
       minute: "2-digit",
       second: "2-digit",
     }).format(new Date()),
+    count,
     lines: tickets.map((ticket, index) => `${index + 1}. ${formatTicket(ticket)}`),
   });
   history = history.slice(0, HISTORY_LIMIT);
@@ -231,6 +256,7 @@ function clearTickets() {
   tickets = [];
   history = [];
   drawCount = 0;
+  saveDrawCount(drawCount);
   resultGrid.innerHTML = "";
   historyList.innerHTML = "";
   drawCountEl.textContent = "0";
@@ -238,6 +264,8 @@ function clearTickets() {
 }
 
 if (hasGenerator) {
+  drawCount = getStoredDrawCount();
+  drawCountEl.textContent = drawCount;
   generateBtn.addEventListener("click", generateTickets);
   copyBtn.addEventListener("click", copyTickets);
   clearBtn.addEventListener("click", clearTickets);
@@ -260,21 +288,74 @@ window.addEventListener("load", () => {
 });
 
 function initVisitorCount() {
-  let totalVisitors = localStorage.getItem('total_visitors');
-  if (!totalVisitors) {
-    totalVisitors = Math.floor(Math.random() * 5000) + 12840;
-  }
-  totalVisitors = parseInt(totalVisitors) + 1;
-  localStorage.setItem('total_visitors', totalVisitors);
+  const now = new Date();
+  const todayKey = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0"),
+  ].join("-");
+  const storageKey = "lotto_visitor_stats";
+  const sessionKey = `lotto_visit_counted_${todayKey}`;
+  let stats;
 
-  const todayVisitors = Math.floor(Math.random() * 50) + 420;
+  try {
+    stats = JSON.parse(localStorage.getItem(storageKey) || "{}");
+  } catch {
+    stats = {};
+  }
+
+  // If it's a new day or first time initialization
+  if (stats.date !== todayKey) {
+    const legacyTotal = Number(localStorage.getItem("total_visitors")) || 0;
+    const initialToday = Math.floor(Math.random() * 31) + 420; // 420-450
+    
+    let newTotal;
+    if (legacyTotal > 0) {
+      // If we have a legacy total, we add the initial today to it to stay consistent
+      newTotal = legacyTotal + initialToday;
+    } else {
+      // First time initialization
+      newTotal = Math.floor(Math.random() * 5001) + 12840; // 12840-17840
+    }
+
+    stats = {
+      date: todayKey,
+      today: initialToday,
+      total: newTotal
+    };
+  }
+
+  let alreadyCounted = false;
+  try {
+    alreadyCounted = sessionStorage.getItem(sessionKey) === "1";
+  } catch {
+    alreadyCounted = false;
+  }
+
+  if (!alreadyCounted) {
+    stats.today += 1;
+    stats.total += 1;
+    try {
+      sessionStorage.setItem(sessionKey, "1");
+    } catch {
+      // Storage can be unavailable in strict privacy modes.
+    }
+  }
+
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(stats));
+    localStorage.setItem("total_visitors", stats.total);
+    console.log(`[Visitor Stats] Updated: Today=${stats.today}, Total=${stats.total}`);
+  } catch {
+    // Keep rendering even if persistence fails.
+  }
   
   const visitorElements = document.querySelectorAll('.visitor-stats');
   visitorElements.forEach(el => {
     el.innerHTML = `
-      <span>오늘 <b>${todayVisitors.toLocaleString()}</b></span>
+      <span class="visitor-stat-item">오늘 방문 <b>${stats.today.toLocaleString()}</b></span>
       <div class="stat-divider"></div>
-      <span>전체 <b>${totalVisitors.toLocaleString()}</b></span>
+      <span class="visitor-stat-item">전체 <b>${stats.total.toLocaleString()}</b></span>
     `;
   });
 }
