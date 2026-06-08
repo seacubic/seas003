@@ -454,18 +454,33 @@ function showChartTab(event, tabId) {
   document.getElementById(tabId).classList.add("active");
   event.currentTarget.classList.remove("secondary-action");
   event.currentTarget.classList.add("primary-action", "active");
+  window.setTimeout(resizeCharts, 0);
 }
 
 let chartsInitialized = false;
+let chartInstances = [];
+
+function resizeCharts() {
+  chartInstances.forEach((chart) => chart?.resize());
+}
+
 function initCharts() {
-  if (chartsInitialized) return;
+  if (chartsInitialized) {
+    resizeCharts();
+    return;
+  }
   chartsInitialized = true;
 
   Chart.defaults.color = "#9db2bd";
   Chart.defaults.font.family = "system-ui, sans-serif";
 
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+  };
+
   // 번호 빈도
-  new Chart(document.getElementById("freqChart"), {
+  chartInstances.push(new Chart(document.getElementById("freqChart"), {
     type: "bar",
     data: {
       labels: ["14", "17", "4", "9", "13", "2", "1", "45"],
@@ -479,17 +494,16 @@ function initCharts() {
       ],
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
+      ...chartOptions,
       scales: {
         y: { beginAtZero: true, grid: { color: "rgba(255,255,255,0.05)" } },
         x: { grid: { display: false } },
       },
     },
-  });
+  }));
 
   // 구간 분석
-  new Chart(document.getElementById("rangeChart"), {
+  chartInstances.push(new Chart(document.getElementById("rangeChart"), {
     type: "pie",
     data: {
       labels: ["1~10", "11~20", "21~30", "31~40", "41~45"],
@@ -501,11 +515,11 @@ function initCharts() {
         },
       ],
     },
-    options: { responsive: true, maintainAspectRatio: false },
-  });
+    options: { ...chartOptions },
+  }));
 
   // 홀짝 비율
-  new Chart(document.getElementById("oddEvenChart"), {
+  chartInstances.push(new Chart(document.getElementById("oddEvenChart"), {
     type: "doughnut",
     data: {
       labels: ["홀3짝3", "홀2짝4", "홀4짝2", "올홀수", "올짝수"],
@@ -517,11 +531,11 @@ function initCharts() {
         },
       ],
     },
-    options: { responsive: true, maintainAspectRatio: false, cutout: "70%" },
-  });
+    options: { ...chartOptions, cutout: "70%" },
+  }));
 
   // 합계 분석
-  new Chart(document.getElementById("sumChart"), {
+  chartInstances.push(new Chart(document.getElementById("sumChart"), {
     type: "line",
     data: {
       labels: ["~80", "81~120", "121~160", "161~200", "201~"],
@@ -538,18 +552,25 @@ function initCharts() {
       ],
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
+      ...chartOptions,
       scales: {
         y: { beginAtZero: true, grid: { color: "rgba(255,255,255,0.05)" } },
         x: { grid: { color: "rgba(255,255,255,0.05)" } },
       },
     },
-  });
+  }));
+
+  window.setTimeout(resizeCharts, 120);
 }
 
-window.addEventListener("resize", resizeCanvas);
-window.visualViewport?.addEventListener("resize", resizeCanvas);
+window.addEventListener("resize", () => {
+  resizeCanvas();
+  resizeCharts();
+});
+window.visualViewport?.addEventListener("resize", () => {
+  resizeCanvas();
+  resizeCharts();
+});
 window.addEventListener("orientationchange", () => {
   window.setTimeout(resizeCanvas, 250);
 });
