@@ -28,10 +28,20 @@
       }
       .stat-card b { color: var(--cyan); }
       .chart-wrapper {
+        width: 100%;
+        max-width: 100%;
+        min-height: 280px;
         background: rgba(12, 18, 28, 0.4);
-        padding: 20px;
+        padding: 16px;
         border-radius: 12px;
         backdrop-filter: blur(10px);
+        box-sizing: border-box;
+      }
+      .chart-wrapper canvas {
+        width: 100% !important;
+        height: 260px !important;
+        max-width: 100%;
+        display: block;
       }
       .tab-content { display: none; }
       .tab-content.active { display: block; }
@@ -44,6 +54,32 @@
         font-size: 0.85rem;
         color: #fdd;
       }
+      @media (max-width: 640px) {
+        .dashboard-container { gap: 16px; }
+        .chart-tab-nav {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 8px;
+        }
+        .chart-tab-nav .tab-btn {
+          width: 100%;
+          flex: 1 1 auto;
+          min-height: 40px;
+          font-size: 0.82rem;
+          text-align: center;
+        }
+        .chart-wrapper {
+          min-height: 240px;
+          padding: 12px;
+        }
+        .chart-wrapper canvas {
+          height: 220px !important;
+        }
+        .stat-card {
+          font-size: 0.92rem;
+          line-height: 1.5;
+        }
+      }
     </style>
   </head>
   <body>
@@ -55,8 +91,11 @@
         <a class="nav-btn secondary-action" href="dreams.html">꿈 해몽</a>
         <a class="nav-btn primary-action active" href="analysis.html">데이터 분석</a>
         <a class="nav-btn secondary-action" href="stories.html">이야기</a>
+        <button id="musicToggleBtn" class="nav-btn secondary-action music-toggle" type="button" aria-pressed="false" title="배경음악 켜기/끄기">♪ 음악</button>
         <div class="visitor-stats"></div>
       </nav>
+
+      <audio id="bgAudio" loop autoplay preload="auto" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
 
       <section class="generator-panel">
         <div class="dashboard-container">

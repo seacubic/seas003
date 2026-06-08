@@ -275,13 +275,16 @@ textarea#dreamInput:focus {
 /* Share Card Styles */
 #shareCardContainer {
     display: none;
+    width: 100%;
     margin-top: 40px;
     text-align: center;
     animation: fadeIn 0.5s ease;
 }
 
 #shareCard {
-    width: 600px;
+    width: min(600px, 100%);
+    max-width: 100%;
+    box-sizing: border-box;
     background: #020617;
     border: 2px solid #8b5cf6;
     border-radius: 32px;
@@ -350,7 +353,15 @@ textarea#dreamInput:focus {
 @media(max-width:600px){
     .container { padding: 20px 16px; }
     .hero h1 { font-size: 2.2rem; }
-    .share-balls { gap: 6px; }
+    #shareCard {
+        width: 100%;
+        padding: 18px;
+        border-radius: 20px;
+    }
+    .share-balls {
+        gap: 6px;
+        flex-wrap: wrap;
+    }
     .ball { width: 44px; height: 44px; font-size: 16px; }
 }
 </style>
@@ -366,8 +377,11 @@ textarea#dreamInput:focus {
         <a href="dreams.html" class="nav-btn primary-action active">꿈 해몽</a>
         <a href="analysis.html" class="nav-btn secondary-action">데이터 분석</a>
         <a href="stories.html" class="nav-btn secondary-action">이야기</a>
+        <button id="musicToggleBtn" class="nav-btn secondary-action music-toggle" type="button" aria-pressed="false" title="배경음악 켜기/끄기">♪ 음악</button>
         <div class="visitor-stats"></div>
     </nav>
+
+    <audio id="bgAudio" loop autoplay preload="auto" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
 
     <div class="hero">
         <p class="eyebrow">Dream Lotto</p>

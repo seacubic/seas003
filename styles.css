@@ -502,7 +502,13 @@ button:hover {
 
 .app-nav .nav-btn {
   flex: 0 0 auto;
+  min-height: 40px;
   height: 40px;
+}
+
+.app-nav .music-toggle {
+  margin-left: auto;
+  white-space: nowrap;
 }
 
 .nav-btn.active {
@@ -738,7 +744,24 @@ button:hover {
     width: min(100% - 20px, 1180px);
   }
 
+  .app-nav {
+    gap: 8px;
+  }
+
+  .app-nav .nav-btn,
+  .app-nav .music-toggle {
+    flex: 1 1 calc(50% - 8px);
+    min-height: 44px;
+    height: 44px;
+  }
+
+  .app-nav .music-toggle {
+    margin-left: 0;
+  }
+
   .visitor-stats {
+    flex: 1 1 100%;
+    justify-content: center;
     margin-left: 0;
   }
 

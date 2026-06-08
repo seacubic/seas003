@@ -18,6 +18,7 @@ const copyBtn = document.getElementById("copyBtn");
 const clearBtn = document.getElementById("clearBtn");
 const musicToggleBtn = document.getElementById("musicToggleBtn");
 const bgAudio = document.getElementById("bgAudio");
+const hasMusic = Boolean(musicToggleBtn && bgAudio);
 const hasGenerator = Boolean(
   resultGrid &&
     historyList &&
@@ -267,35 +268,61 @@ function clearTickets() {
   statusText.textContent = "초기화됨";
 }
 
-if (hasGenerator) {
-  drawCount = getStoredDrawCount();
-  drawCountEl.textContent = drawCount;
-  bgAudio.volume = 0.18;
-  bgAudio.muted = true;
+function initMusicControl() {
+  if (!hasMusic) return;
 
-  bgAudio.play().catch(() => {
-    statusText.textContent = "자동 재생이 차단되어 있습니다";
-  });
+  bgAudio.volume = 0.18;
+  bgAudio.muted = false;
+  musicToggleBtn.textContent = "♪ 음악";
+  musicToggleBtn.setAttribute("aria-pressed", "true");
+
+  const setMusicLabel = (playing) => {
+    musicToggleBtn.textContent = playing ? "⏸ 음악" : "♪ 음악";
+    musicToggleBtn.setAttribute("aria-pressed", String(playing));
+  };
+
+  const showMusicStatus = (message) => {
+    if (statusText) {
+      statusText.textContent = message;
+    }
+  };
+
+  const tryAutoPlay = async () => {
+    try {
+      await bgAudio.play();
+      setMusicLabel(!bgAudio.paused);
+      showMusicStatus("잔잔한 배경음악 재생 중");
+    } catch (error) {
+      setMusicLabel(false);
+      showMusicStatus("자동 재생이 차단되었습니다. 버튼을 눌러 재생해 주세요.");
+      console.error(error);
+    }
+  };
 
   musicToggleBtn.addEventListener("click", async () => {
     try {
       if (bgAudio.paused || bgAudio.muted) {
         bgAudio.muted = false;
         await bgAudio.play();
-        musicToggleBtn.textContent = "♪";
-        musicToggleBtn.setAttribute("aria-pressed", "true");
-        statusText.textContent = "잔잔한 배경음악 재생 중";
+        setMusicLabel(true);
+        showMusicStatus("잔잔한 배경음악 재생 중");
       } else {
         bgAudio.pause();
-        musicToggleBtn.textContent = "♪";
-        musicToggleBtn.setAttribute("aria-pressed", "false");
-        statusText.textContent = "배경음악 정지";
+        setMusicLabel(false);
+        showMusicStatus("배경음악 정지");
       }
     } catch (error) {
-      statusText.textContent = "음악 재생을 시작할 수 없습니다";
+      showMusicStatus("음악 재생을 시작할 수 없습니다");
       console.error(error);
     }
   });
+
+  void tryAutoPlay();
+}
+
+if (hasGenerator) {
+  drawCount = getStoredDrawCount();
+  drawCountEl.textContent = drawCount;
 
   generateBtn.addEventListener("click", generateTickets);
   copyBtn.addEventListener("click", copyTickets);
@@ -305,6 +332,8 @@ if (hasGenerator) {
 // --- View Switching & Charts ---
 
 window.addEventListener("load", () => {
+  initMusicControl();
+
   if (window.location.pathname.includes('analysis.html')) {
     initCharts();
   }
@@ -451,6 +480,7 @@ function initCharts() {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       scales: {
         y: { beginAtZero: true, grid: { color: "rgba(255,255,255,0.05)" } },
         x: { grid: { display: false } },
@@ -471,7 +501,7 @@ function initCharts() {
         },
       ],
     },
-    options: { responsive: true },
+    options: { responsive: true, maintainAspectRatio: false },
   });
 
   // 홀짝 비율
@@ -487,7 +517,7 @@ function initCharts() {
         },
       ],
     },
-    options: { responsive: true, cutout: "70%" },
+    options: { responsive: true, maintainAspectRatio: false, cutout: "70%" },
   });
 
   // 합계 분석
@@ -509,6 +539,7 @@ function initCharts() {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       scales: {
         y: { beginAtZero: true, grid: { color: "rgba(255,255,255,0.05)" } },
         x: { grid: { color: "rgba(255,255,255,0.05)" } },
