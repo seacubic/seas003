@@ -746,13 +746,22 @@ button:hover {
 
   .app-nav {
     gap: 8px;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
   }
 
   .app-nav .nav-btn,
   .app-nav .music-toggle {
-    flex: 1 1 calc(50% - 8px);
-    min-height: 44px;
-    height: 44px;
+    flex: 0 0 auto;
+    min-height: 42px;
+    height: 42px;
+    padding: 0 12px;
+    font-size: 0.82rem;
+    white-space: nowrap;
   }
 
   .app-nav .music-toggle {
@@ -760,9 +769,12 @@ button:hover {
   }
 
   .visitor-stats {
-    flex: 1 1 100%;
+    flex: 0 0 auto;
     justify-content: center;
     margin-left: 0;
+    min-height: 42px;
+    padding: 6px 10px;
+    font-size: 0.72rem;
   }
 
   .panel-top {
