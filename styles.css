@@ -591,6 +591,32 @@ button:hover {
   gap: 18px;
 }
 
+.legal-shell {
+  padding-bottom: 24px;
+}
+
+.legal-card {
+  border-radius: 14px;
+}
+
+.legal-copy {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  color: #dcebf0;
+}
+
+.legal-copy h2 {
+  font-size: 1.02rem;
+  color: var(--text);
+}
+
+.legal-copy p {
+  margin: 0;
+  line-height: 1.72;
+  color: #dcebf0;
+}
+
 .story-card {
   display: grid;
   grid-template-columns: 210px minmax(0, 1fr);

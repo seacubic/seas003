@@ -18,6 +18,11 @@ const copyBtn = document.getElementById("copyBtn");
 const clearBtn = document.getElementById("clearBtn");
 const musicToggleBtn = document.getElementById("musicToggleBtn");
 const bgAudio = document.getElementById("bgAudio");
+const MUSIC_TRACKS = [
+  { label: "음악1", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+  { label: "음악2", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+  { label: "음악3", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
+];
 const hasMusic = Boolean(musicToggleBtn && bgAudio);
 const hasGenerator = Boolean(
   resultGrid &&
@@ -271,14 +276,23 @@ function clearTickets() {
 function initMusicControl() {
   if (!hasMusic) return;
 
-  bgAudio.volume = 0.18;
-  bgAudio.muted = false;
-  musicToggleBtn.textContent = "♪ 음악";
-  musicToggleBtn.setAttribute("aria-pressed", "true");
+  let currentMode = 0;
 
-  const setMusicLabel = (playing) => {
-    musicToggleBtn.textContent = playing ? "⏸ 음악" : "♪ 음악";
-    musicToggleBtn.setAttribute("aria-pressed", String(playing));
+  bgAudio.volume = 0.18;
+  bgAudio.loop = true;
+  bgAudio.muted = false;
+  bgAudio.src = MUSIC_TRACKS[0].src;
+  bgAudio.load();
+
+  const setMusicLabel = (mode) => {
+    if (mode === 3) {
+      musicToggleBtn.textContent = "⏸ 정지";
+      musicToggleBtn.setAttribute("aria-pressed", "false");
+      return;
+    }
+
+    musicToggleBtn.textContent = `♪ ${MUSIC_TRACKS[mode].label}`;
+    musicToggleBtn.setAttribute("aria-pressed", "true");
   };
 
   const showMusicStatus = (message) => {
@@ -287,13 +301,35 @@ function initMusicControl() {
     }
   };
 
+  const playMode = async (mode) => {
+    const track = MUSIC_TRACKS[mode];
+
+    if (bgAudio.currentSrc !== track.src) {
+      bgAudio.src = track.src;
+      bgAudio.load();
+    }
+
+    bgAudio.muted = false;
+    await bgAudio.play();
+
+    currentMode = mode;
+    setMusicLabel(mode);
+    showMusicStatus(`잔잔한 ${track.label} 재생 중`);
+  };
+
+  const stopMusic = () => {
+    bgAudio.pause();
+    currentMode = 3;
+    setMusicLabel(3);
+    showMusicStatus("배경음악 정지");
+  };
+
   const tryAutoPlay = async () => {
     try {
-      await bgAudio.play();
-      setMusicLabel(!bgAudio.paused);
-      showMusicStatus("잔잔한 배경음악 재생 중");
+      await playMode(0);
     } catch (error) {
-      setMusicLabel(false);
+      currentMode = 3;
+      setMusicLabel(3);
       showMusicStatus("자동 재생이 차단되었습니다. 버튼을 눌러 재생해 주세요.");
       console.error(error);
     }
@@ -301,15 +337,16 @@ function initMusicControl() {
 
   musicToggleBtn.addEventListener("click", async () => {
     try {
-      if (bgAudio.paused || bgAudio.muted) {
-        bgAudio.muted = false;
-        await bgAudio.play();
-        setMusicLabel(true);
-        showMusicStatus("잔잔한 배경음악 재생 중");
+      if (currentMode === 3) {
+        await playMode(0);
+        return;
+      }
+
+      const nextMode = currentMode === 2 ? 3 : currentMode + 1;
+      if (nextMode === 3) {
+        stopMusic();
       } else {
-        bgAudio.pause();
-        setMusicLabel(false);
-        showMusicStatus("배경음악 정지");
+        await playMode(nextMode);
       }
     } catch (error) {
       showMusicStatus("음악 재생을 시작할 수 없습니다");
@@ -317,6 +354,7 @@ function initMusicControl() {
     }
   });
 
+  setMusicLabel(0);
   void tryAutoPlay();
 }
 

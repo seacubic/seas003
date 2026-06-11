@@ -3,11 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="꿈 해몽 기반으로 로또 번호를 추천하고, 상징·감정·점수로 정리해 보여주는 무료 정보 사이트입니다.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="theme-color" content="#071017">
+<meta name="author" content="로또 그리고">
 <title>로또 그리고 | 꿈 해몽</title>
-<link rel="stylesheet" href="styles.css">
+<link rel="canonical" href="./dreams.html">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
     font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
@@ -15,16 +21,81 @@ body {
     color: white;
     min-height: 100vh;
     overflow-x: hidden;
-    margin: 0;
 }
 
+/* ── Space Canvas ── */
 #spaceCanvas {
     position: fixed;
     inset: 0;
-    z-index: -1;
+    z-index: 0;
     pointer-events: none;
 }
 
+/* ── Navigation ── */
+.app-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+    padding: 14px 20px;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.nav-btn {
+    padding: 8px 18px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: 0.25s;
+    font-family: inherit;
+}
+
+.nav-btn.primary-action {
+    background: linear-gradient(90deg, #7c3aed, #06b6d4);
+    color: white;
+}
+
+.nav-btn.secondary-action {
+    background: rgba(255,255,255,0.07);
+    color: #94a3b8;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.nav-btn.secondary-action:hover {
+    background: rgba(255,255,255,0.13);
+    color: white;
+}
+
+.nav-btn.active {
+    background: linear-gradient(90deg, #7c3aed, #06b6d4);
+    color: white;
+}
+
+.music-toggle {
+    margin-left: auto;
+}
+
+.music-toggle.playing {
+    background: rgba(34,211,238,0.15);
+    color: #22d3ee;
+    border-color: rgba(34,211,238,0.3);
+}
+
+.visitor-stats {
+    font-size: 12px;
+    color: #475569;
+    white-space: nowrap;
+}
+
+/* ── Layout ── */
 .container {
     max-width: 1400px;
     margin: auto;
@@ -46,11 +117,13 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin: 10px 0;
+    line-height: 1.1;
 }
 
 .hero p {
     color: #94a3b8;
     font-size: 1.2rem;
+    margin-top: 8px;
 }
 
 .layout {
@@ -60,8 +133,8 @@ body {
 }
 
 .panel {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)), rgba(12, 18, 28, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)), rgba(12,18,28,0.35);
+    border: 1px solid rgba(255,255,255,0.12);
     border-radius: 24px;
     padding: 24px;
     backdrop-filter: blur(20px) saturate(1.4);
@@ -78,9 +151,9 @@ body {
 textarea#dreamInput {
     width: 100%;
     height: 240px;
-    background: rgba(5, 9, 14, 0.4);
+    background: rgba(5,9,14,0.4);
     color: white;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255,255,255,0.1);
     outline: none;
     resize: none;
     padding: 18px;
@@ -88,10 +161,14 @@ textarea#dreamInput {
     font-size: 16px;
     line-height: 1.6;
     transition: 0.3s;
+    font-family: inherit;
 }
+
+textarea#dreamInput::placeholder { color: #475569; }
 
 textarea#dreamInput:focus {
     border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.15);
 }
 
 .oracle-btn {
@@ -106,13 +183,37 @@ textarea#dreamInput:focus {
     background: linear-gradient(90deg, #7c3aed, #06b6d4);
     color: white;
     transition: 0.3s;
+    font-family: inherit;
+    position: relative;
+    overflow: hidden;
 }
 
 .oracle-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+    box-shadow: 0 8px 25px rgba(124,58,237,0.4);
 }
 
+.oracle-btn:active { transform: translateY(0); }
+
+.oracle-btn.loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.oracle-btn.loading::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: shimmer 1.2s infinite;
+}
+
+@keyframes shimmer {
+    to { left: 100%; }
+}
+
+/* ── Grid Cards ── */
 .grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -120,8 +221,8 @@ textarea#dreamInput:focus {
 }
 
 .card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)), rgba(12, 18, 28, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)), rgba(12,18,28,0.35);
+    border: 1px solid rgba(255,255,255,0.12);
     border-radius: 22px;
     padding: 22px;
     min-height: 220px;
@@ -137,25 +238,35 @@ textarea#dreamInput:focus {
     color: #fff;
 }
 
+/* ── Symbols ── */
 .symbols {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    min-height: 60px;
 }
 
 .symbol {
     padding: 10px 14px;
     border-radius: 14px;
     background: #1e293b;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255,255,255,0.06);
     font-size: 14px;
     color: #c4b5fd;
+    animation: fadeSlideIn 0.4s ease backwards;
 }
 
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Numbers (Lotto Balls) ── */
 .numbers {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+    margin-top: 8px;
 }
 
 .ball {
@@ -168,15 +279,17 @@ textarea#dreamInput:focus {
     font-weight: 700;
     font-size: 22px;
     background: linear-gradient(135deg, #7c3aed, #06b6d4);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.25);
     animation: floatBall 3s ease-in-out infinite;
+    flex-shrink: 0;
 }
 
 @keyframes floatBall {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    50% { transform: translateY(-8px); }
 }
 
+/* ── Energy Bar ── */
 .energy {
     width: 100%;
     height: 14px;
@@ -190,50 +303,55 @@ textarea#dreamInput:focus {
     height: 100%;
     width: 0%;
     background: linear-gradient(90deg, #22d3ee, #8b5cf6);
-    transition: 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    border-radius: 20px;
 }
 
+/* ── Dream Visual ── */
 .dream-visual {
-        border-radius: 22px;
-        padding: 14px;
-        background:
-            linear-gradient(145deg, rgba(7, 16, 23, 0.95), rgba(15, 23, 42, 0.88)),
-            radial-gradient(circle at top, rgba(125, 211, 252, 0.16), transparent 35%);
-        border: 1px solid rgba(125, 211, 252, 0.18);
-        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), 0 18px 42px rgba(2, 6, 23, 0.45);
-        min-height: 260px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
-
-    .dream-visual-badge {
-        align-self: flex-start;
-        border-radius: 999px;
-        border: 1px solid rgba(125, 211, 252, 0.25);
-        background: rgba(15, 23, 42, 0.85);
-        color: #d8f5ff;
-        padding: 7px 10px;
-        font-size: 12px;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-    }
-
-    .dream-visual-svg {
-        width: 100%;
-        height: auto;
-        filter: drop-shadow(0 0 24px rgba(56, 189, 248, 0.18));
-        animation: digitalFloat 4.4s ease-in-out infinite;
-    }
-
-    @keyframes digitalFloat {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-6px); }
+    border-radius: 22px;
+    padding: 14px;
+    background:
+        linear-gradient(145deg, rgba(7,16,23,0.95), rgba(15,23,42,0.88)),
+        radial-gradient(circle at top, rgba(125,211,252,0.16), transparent 35%);
+    border: 1px solid rgba(125,211,252,0.18);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), 0 18px 42px rgba(2,6,23,0.45);
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
+.dream-visual-badge {
+    align-self: flex-start;
+    border-radius: 999px;
+    border: 1px solid rgba(125,211,252,0.25);
+    background: rgba(15,23,42,0.85);
+    color: #d8f5ff;
+    padding: 7px 10px;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.dream-visual-svg {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 0 24px rgba(56,189,248,0.18));
+    animation: digitalFloat 4.4s ease-in-out infinite;
+}
+
+@keyframes digitalFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+}
+
+/* ── Analysis ── */
 .analysis {
     line-height: 1.8;
     color: #cbd5e1;
+    font-size: 15px;
 }
 
 .code {
@@ -244,8 +362,10 @@ textarea#dreamInput:focus {
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    letter-spacing: 0.05em;
 }
 
+/* ── Score Items ── */
 .score-items {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -258,21 +378,23 @@ textarea#dreamInput:focus {
     padding: 14px;
     border-radius: 16px;
     text-align: center;
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: 0.3s;
 }
 
-.score-label {
-    color: #94a3b8;
-    font-size: 12px;
-}
+.score-box:hover { border-color: rgba(139,92,246,0.3); }
+
+.score-label { color: #94a3b8; font-size: 12px; }
 
 .score-num {
     margin-top: 6px;
     font-size: 20px;
     font-weight: 700;
     color: #a78bfa;
+    transition: all 0.8s ease;
 }
 
-/* Share Card Styles */
+/* ── Share Card ── */
 #shareCardContainer {
     display: none;
     width: 100%;
@@ -296,6 +418,24 @@ textarea#dreamInput:focus {
     box-shadow: 0 20px 50px rgba(0,0,0,0.8);
 }
 
+#shareCard::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 20%, rgba(124,58,237,0.12), transparent 60%),
+                radial-gradient(circle at 70% 80%, rgba(6,182,212,0.08), transparent 60%);
+    pointer-events: none;
+}
+
+.eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #8b5cf6;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
 .share-header {
     border-bottom: 1px solid rgba(255,255,255,0.1);
     padding-bottom: 20px;
@@ -310,12 +450,14 @@ textarea#dreamInput:focus {
     font-size: 16px;
     line-height: 1.8;
     color: #cbd5e1;
+    word-break: break-all;
 }
 
 .share-balls {
     display: flex;
     justify-content: center;
     gap: 12px;
+    flex-wrap: wrap;
     margin: 30px 0;
 }
 
@@ -332,6 +474,7 @@ textarea#dreamInput:focus {
     display: inline-flex;
     align-items: center;
     gap: 10px;
+    font-family: inherit;
 }
 
 .download-btn:hover {
@@ -339,51 +482,97 @@ textarea#dreamInput:focus {
     transform: scale(1.05);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+/* ── Footer ── */
+.page-footer {
+    text-align: center;
+    padding: 30px;
+    color: #334155;
+    font-size: 13px;
+    position: relative;
+    z-index: 2;
+    margin-top: 20px;
 }
 
-@media(max-width:1000px){
-    .layout{ grid-template-columns: 1fr; }
-    .grid{ grid-template-columns: 1fr; }
+.page-footer a {
+    color: #475569;
+    text-decoration: none;
+}
+
+.page-footer a:hover { color: #94a3b8; }
+
+/* ── Animations ── */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Toast ── */
+#toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(30,41,59,0.95);
+    border: 1px solid rgba(139,92,246,0.4);
+    color: #e2e8f0;
+    padding: 12px 24px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 9999;
+    pointer-events: none;
+    backdrop-filter: blur(12px);
+}
+
+#toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ── Responsive ── */
+@media(max-width:1000px) {
+    .layout { grid-template-columns: 1fr; }
+    .grid { grid-template-columns: 1fr; }
     .input-sticky { position: static; }
 }
 
-@media(max-width:600px){
+@media(max-width:600px) {
     .container { padding: 20px 16px; }
     .hero h1 { font-size: 2.2rem; }
-    #shareCard {
-        width: 100%;
-        padding: 18px;
-        border-radius: 20px;
-    }
-    .share-balls {
-        gap: 6px;
-        flex-wrap: wrap;
-    }
+    .app-nav { gap: 8px; padding: 12px; }
+    .nav-btn { font-size: 13px; padding: 7px 14px; }
+    .music-toggle { margin-left: 0; }
+    #shareCard { width: 100%; padding: 18px; border-radius: 20px; }
+    .share-balls { gap: 6px; }
     .ball { width: 44px; height: 44px; font-size: 16px; }
 }
-</style>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8867593448562984"
-     crossorigin="anonymous"></script>
-</head>
 
+/* ── Reduced motion ── */
+@media(prefers-reduced-motion: reduce) {
+    .ball, .dream-visual-svg { animation: none; }
+    .energy-fill { transition: none; }
+}
+</style>
+</head>
 <body>
 
 <canvas id="spaceCanvas" aria-hidden="true"></canvas>
+<div id="toast" role="status" aria-live="polite"></div>
 
 <div class="container">
-    <nav class="app-nav">
+    <nav class="app-nav" aria-label="사이트 메뉴">
         <a href="lotto.html" class="nav-btn secondary-action">번호 생성</a>
-        <a href="dreams.html" class="nav-btn primary-action active">꿈 해몽</a>
+        <a href="dreams.html" class="nav-btn primary-action active" aria-current="page">꿈 해몽</a>
         <a href="analysis.html" class="nav-btn secondary-action">데이터 분석</a>
         <a href="stories.html" class="nav-btn secondary-action">이야기</a>
         <button id="musicToggleBtn" class="nav-btn secondary-action music-toggle" type="button" aria-pressed="false" title="배경음악 켜기/끄기">♪ 음악</button>
-        <div class="visitor-stats"></div>
+        <div class="visitor-stats" id="visitorStats" aria-live="polite"></div>
     </nav>
 
-    <audio id="bgAudio" loop autoplay preload="auto" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+    <!-- Background audio (muted by default; user must unmute) -->
+    <audio id="bgAudio" loop preload="none" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
 
     <div class="hero">
         <h1>DREAM LOTTO</h1>
@@ -391,22 +580,31 @@ textarea#dreamInput:focus {
     </div>
 
     <div class="layout">
+        <!-- Left: Input Panel -->
         <div class="panel input-sticky">
-            <h2 style="margin-bottom: 20px; font-size: 24px;">🌙 꿈 입력</h2>
-            <textarea id="dreamInput" placeholder="예: 새벽에 용이 하늘로 날아갔다. 금빛 하늘이 보였다. 멀리서 파도 소리가 들렸다."></textarea>
+            <h2 style="margin-bottom:20px; font-size:24px;">🌙 꿈 입력</h2>
+            <textarea id="dreamInput" placeholder="예: 새벽에 용이 하늘로 날아갔다. 금빛 하늘이 보였다. 멀리서 파도 소리가 들렸다." aria-label="꿈 내용 입력"></textarea>
             <button id="dreamAnalyzeBtn" class="oracle-btn" type="button">꿈 분석하기</button>
         </div>
 
+        <!-- Right: Results -->
         <div>
             <div class="panel">
-                <h2 style="margin-bottom: 18px; font-size: 22px;">🧠 꿈 분석</h2>
-                <div class="analysis" id="analysis">꿈을 입력하면 AI가 무의식 상징을 분석합니다.</div>
-                <div class="code" id="dreamCode">DRM-0000</div>
+                <h2 style="margin-bottom:18px; font-size:22px;">🧠 꿈 분석</h2>
+                <div class="analysis" id="analysis" aria-live="polite">꿈을 입력하면 AI가 무의식 상징을 분석합니다.</div>
+                <div class="code" id="dreamCode" aria-label="꿈 코드">DRM-0000</div>
+
+                <!-- Lotto Numbers -->
+                <div style="margin-top:28px;">
+                    <h2 style="font-size:20px; margin-bottom:14px;">🎱 추천 번호</h2>
+                    <div class="numbers" id="numbers" aria-live="polite" aria-label="추천 로또 번호"></div>
+                </div>
             </div>
 
             <div style="height:20px"></div>
 
             <div class="grid">
+                <!-- Dream Visual Card -->
                 <div class="card">
                     <h2>🌌 미래형 꿈 카드</h2>
                     <div id="dreamVisual" class="dream-visual" aria-live="polite">
@@ -426,357 +624,863 @@ textarea#dreamInput:focus {
                             <circle cx="145" cy="118" r="14" fill="#a78bfa" opacity="0.8"/>
                             <rect x="46" y="132" width="148" height="8" rx="4" fill="rgba(148,163,184,0.15)"/>
                             <rect x="56" y="146" width="96" height="6" rx="3" fill="rgba(56,189,248,0.35)"/>
+                            <text x="50%" y="26" text-anchor="middle" fill="rgba(224,242,254,0.6)" font-size="10" font-family="Arial, sans-serif" letter-spacing="2">DIGITAL DREAM</text>
                         </svg>
                     </div>
                 </div>
 
+                <!-- Symbols Card -->
                 <div class="card">
                     <h2>🔮 상징</h2>
-                    <div class="symbols" id="symbols"></div>
+                    <div class="symbols" id="symbols" aria-live="polite" aria-label="감지된 꿈 상징">
+                        <div class="symbol" style="color:#475569;">꿈을 분석하면 상징이 표시됩니다.</div>
+                    </div>
                 </div>
 
+                <!-- Emotion Energy Card -->
                 <div class="card">
                     <h2>⚡ 감정 에너지</h2>
-                    <div id="emotionText" style="font-size: 18px; font-weight: 700;">분석 대기중</div>
-                    <div class="energy">
+                    <div id="emotionText" style="font-size:18px; font-weight:700;" aria-live="polite">분석 대기중</div>
+                    <div class="energy" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="energyBar">
                         <div class="energy-fill" id="energyFill"></div>
                     </div>
-                    <div style="margin-top: 10px; color: #94a3b8; font-size: 14px;">무의식 상징 응집도 측정</div>
+                    <div style="margin-top:10px; color:#94a3b8; font-size:14px;">무의식 상징 응집도 측정</div>
                 </div>
 
+                <!-- Archetype Score Card -->
                 <div class="card">
                     <h2>🧠 Archetype Score</h2>
                     <div class="score-items">
                         <div class="score-box">
                             <div class="score-label">상승</div>
-                            <div class="score-num" id="ascensionScore">0%</div>
+                            <div class="score-num" id="ascensionScore">—</div>
                         </div>
                         <div class="score-box">
                             <div class="score-label">변화</div>
-                            <div class="score-num" id="transformScore">0%</div>
+                            <div class="score-num" id="transformScore">—</div>
                         </div>
                         <div class="score-box">
                             <div class="score-label">권력</div>
-                            <div class="score-num" id="powerScore">0%</div>
+                            <div class="score-num" id="powerScore">—</div>
                         </div>
                         <div class="score-box">
                             <div class="score-label">행운</div>
-                            <div class="score-num" id="luckScore">0%</div>
+                            <div class="score-num" id="luckScore">—</div>
                         </div>
                     </div>
                 </div>
-
             </div>
 
+            <!-- Share / Download Card -->
             <div id="shareCardContainer">
                 <div id="shareCard">
                     <div class="share-header">
                         <div class="eyebrow">DREAM LOTTO AI</div>
-                        <h2 id="shareTitle" style="margin: 5px 0 0; color: #fff; font-size: 26px;">꿈의 해석</h2>
-                        <div id="shareCode" style="font-size: 14px; color: #8b5cf6; font-weight: 700;">DRM-74AC12</div>
+                        <h2 id="shareTitle" style="margin:5px 0 0; color:#fff; font-size:26px;">꿈의 해석</h2>
+                        <div id="shareCode" style="font-size:14px; color:#8b5cf6; font-weight:700;">DRM-74AC12</div>
                     </div>
+                    <!-- 꿈 카드 이미지 슬롯 -->
+                    <div id="shareCardImage" style="margin-bottom:20px; border-radius:16px; overflow:hidden;"></div>
                     <div class="share-content" id="shareContent">꿈 내용이 여기에 표시됩니다...</div>
-                    <div style="font-size: 14px; color: #a5b4fc; text-align: center;">추천 행운 번호</div>
+                    <div style="font-size:14px; color:#a5b4fc; text-align:center;">추천 행운 번호</div>
                     <div class="share-balls" id="shareBalls"></div>
-                    <div style="text-align: center; color: #64748b; font-size: 12px; margin-top: 10px;">
+                    <div style="text-align:center; color:#64748b; font-size:12px; margin-top:10px;">
                         로또 그리고 | 꿈과 숫자 AI 리포트
                     </div>
                 </div>
-                <button class="download-btn" onclick="downloadResultImage()">
-                    <span>💾 저장</span>
+                <button class="download-btn" id="downloadBtn">
+                    <span>💾 이미지로 저장</span>
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<footer class="page-footer">Site under development</footer>
+<footer class="page-footer">
+    Site under development ·
+    <a href="privacy.html">개인정보처리방침</a> ·
+    <a href="terms.html">이용약관</a>
+</footer>
 
-<script src="script.js"></script>
 <script>
-const dreamInput = document.getElementById('dreamInput');
-const dreamAnalyzeBtn = document.getElementById('dreamAnalyzeBtn');
+/* ═══════════════════════════════════════
+   SPACE CANVAS — Star / Nebula Background
+   ═══════════════════════════════════════ */
+(function(){
+    const canvas = document.getElementById('spaceCanvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, stars = [], nebulas = [];
 
-if (dreamInput && dreamAnalyzeBtn) {
-    dreamAnalyzeBtn.addEventListener('click', analyzeDream);
-    dreamInput.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
-            analyzeDream();
+    function resize(){
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    }
+
+    function initStars(){
+        stars = [];
+        for(let i = 0; i < 220; i++){
+            stars.push({
+                x: Math.random() * W,
+                y: Math.random() * H,
+                r: Math.random() * 1.6 + 0.3,
+                a: Math.random(),
+                speed: Math.random() * 0.004 + 0.001,
+                phase: Math.random() * Math.PI * 2
+            });
+        }
+        nebulas = [];
+        const colors = ['rgba(124,58,237,', 'rgba(6,182,212,', 'rgba(167,139,250,'];
+        for(let i = 0; i < 5; i++){
+            nebulas.push({
+                x: Math.random() * W,
+                y: Math.random() * H,
+                r: 80 + Math.random() * 160,
+                color: colors[i % colors.length],
+                a: 0.03 + Math.random() * 0.05
+            });
+        }
+    }
+
+    let t = 0;
+    function draw(){
+        ctx.clearRect(0, 0, W, H);
+
+        // Nebulas
+        nebulas.forEach(n => {
+            const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
+            grad.addColorStop(0, n.color + n.a + ')');
+            grad.addColorStop(1, n.color + '0)');
+            ctx.beginPath();
+            ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+        });
+
+        // Stars
+        t += 0.016;
+        stars.forEach(s => {
+            const pulse = 0.5 + 0.5 * Math.sin(t * s.speed * 60 + s.phase);
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.r * (0.8 + 0.4 * pulse), 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255,255,255,${0.3 + 0.7 * pulse * s.a})`;
+            ctx.fill();
+        });
+
+        requestAnimationFrame(draw);
+    }
+
+    resize();
+    initStars();
+    draw();
+    window.addEventListener('resize', () => { resize(); initStars(); });
+})();
+
+/* ═══════════════════════════════════════
+   MUSIC TOGGLE
+   ═══════════════════════════════════════ */
+(function(){
+    const btn   = document.getElementById('musicToggleBtn');
+    const audio = document.getElementById('bgAudio');
+    let playing = false;
+
+    btn.addEventListener('click', () => {
+        if(!playing){
+            audio.volume = 0.25;
+            audio.play().then(() => {
+                playing = true;
+                btn.textContent = '♫ 음악 끄기';
+                btn.setAttribute('aria-pressed', 'true');
+                btn.classList.add('playing');
+            }).catch(() => {
+                showToast('오디오를 재생할 수 없습니다.');
+            });
+        } else {
+            audio.pause();
+            audio.currentTime = 0;
+            playing = false;
+            btn.textContent = '♪ 음악';
+            btn.setAttribute('aria-pressed', 'false');
+            btn.classList.remove('playing');
         }
     });
+})();
+
+/* ═══════════════════════════════════════
+   VISITOR STATS (sessionStorage counter)
+   ═══════════════════════════════════════ */
+(function(){
+    const el = document.getElementById('visitorStats');
+    try {
+        let count = parseInt(localStorage.getItem('dreamVisits') || '0') + 1;
+        localStorage.setItem('dreamVisits', count);
+        el.textContent = `방문 ${count.toLocaleString()}회`;
+    } catch(e) {
+        el.textContent = '';
+    }
+})();
+
+/* ═══════════════════════════════════════
+   TOAST HELPER
+   ═══════════════════════════════════════ */
+function showToast(msg, duration = 3000){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), duration);
 }
 
+/* ═══════════════════════════════════════
+   SYMBOL DATABASE
+   ═══════════════════════════════════════ */
 const symbolDB = {
     // Nature
-    "물": { meaning: "무의식·재물 흐름", numbers: [1, 6], ascension: 55, transform: 75, power: 50, luck: 85 },
-    "바다": { meaning: "거대한 가능성", numbers: [7, 21], ascension: 60, transform: 80, power: 55, luck: 90 },
-    "강": { meaning: "인생 흐름", numbers: [6, 16], ascension: 50, transform: 70, power: 45, luck: 75 },
-    "폭포": { meaning: "에너지 분출", numbers: [9, 29], ascension: 75, transform: 85, power: 80, luck: 70 },
-    "비": { meaning: "정화", numbers: [4, 14], ascension: 65, transform: 90, power: 40, luck: 80 },
-    "눈": { meaning: "감정 억제", numbers: [11, 31], ascension: 50, transform: 60, power: 40, luck: 65 },
-    "얼음": { meaning: "정체 상태", numbers: [2, 22], ascension: 40, transform: 50, power: 45, luck: 55 },
-    "불": { meaning: "변화·열정", numbers: [9, 19], ascension: 80, transform: 95, power: 90, luck: 70 },
-    "연기": { meaning: "혼란", numbers: [5, 15], ascension: 45, transform: 65, power: 35, luck: 50 },
-    "번개": { meaning: "갑작스러운 사건", numbers: [17, 37], ascension: 85, transform: 90, power: 95, luck: 75 },
-    "태양": { meaning: "성공", numbers: [1, 10], ascension: 95, transform: 70, power: 98, luck: 95 },
-    "달": { meaning: "직관", numbers: [2, 12], ascension: 70, transform: 80, power: 60, luck: 85 },
-    "별": { meaning: "희망", numbers: [7, 27], ascension: 90, transform: 65, power: 50, luck: 95 },
-    "하늘": { meaning: "자유", numbers: [7, 17], ascension: 95, transform: 75, power: 70, luck: 85 },
-    "구름": { meaning: "불확실성", numbers: [5, 25], ascension: 55, transform: 70, power: 40, luck: 60 },
-    "바람": { meaning: "변화", numbers: [6, 26], ascension: 60, transform: 90, power: 50, luck: 70 },
-    "폭풍": { meaning: "갈등", numbers: [9, 39], ascension: 50, transform: 95, power: 85, luck: 45 },
-    "지진": { meaning: "인생 전환", numbers: [8, 28], ascension: 45, transform: 98, power: 95, luck: 60 },
-    "산": { meaning: "목표", numbers: [5, 15], ascension: 90, transform: 60, power: 80, luck: 75 },
-    "숲": { meaning: "무의식 탐험", numbers: [3, 13], ascension: 65, transform: 80, power: 55, luck: 85 },
-    "나무": { meaning: "성장", numbers: [14, 34], ascension: 80, transform: 70, power: 60, luck: 80 },
-    "꽃": { meaning: "기쁨", numbers: [11, 21], ascension: 75, transform: 65, power: 40, luck: 90 },
-    "장미": { meaning: "사랑", numbers: [24, 44], ascension: 70, transform: 70, power: 50, luck: 85 },
-    "해바라기": { meaning: "긍정", numbers: [17, 27], ascension: 85, transform: 60, power: 55, luck: 95 },
-    "잔디": { meaning: "안정", numbers: [4, 24], ascension: 60, transform: 50, power: 45, luck: 80 },
-
+    "물":    { meaning:"무의식·재물 흐름", numbers:[1,6],   ascension:55, transform:75, power:50, luck:85 },
+    "바다":  { meaning:"거대한 가능성",    numbers:[7,21],  ascension:60, transform:80, power:55, luck:90 },
+    "강":    { meaning:"인생 흐름",        numbers:[6,16],  ascension:50, transform:70, power:45, luck:75 },
+    "폭포":  { meaning:"에너지 분출",      numbers:[9,29],  ascension:75, transform:85, power:80, luck:70 },
+    "비":    { meaning:"정화",             numbers:[4,14],  ascension:65, transform:90, power:40, luck:80 },
+    "눈":    { meaning:"감정 억제",        numbers:[11,31], ascension:50, transform:60, power:40, luck:65 },
+    "얼음":  { meaning:"정체 상태",        numbers:[2,22],  ascension:40, transform:50, power:45, luck:55 },
+    "불":    { meaning:"변화·열정",        numbers:[9,19],  ascension:80, transform:95, power:90, luck:70 },
+    "연기":  { meaning:"혼란",             numbers:[5,15],  ascension:45, transform:65, power:35, luck:50 },
+    "번개":  { meaning:"갑작스러운 사건",  numbers:[17,37], ascension:85, transform:90, power:95, luck:75 },
+    "태양":  { meaning:"성공",             numbers:[1,10],  ascension:95, transform:70, power:98, luck:95 },
+    "달":    { meaning:"직관",             numbers:[2,12],  ascension:70, transform:80, power:60, luck:85 },
+    "별":    { meaning:"희망",             numbers:[7,27],  ascension:90, transform:65, power:50, luck:95 },
+    "하늘":  { meaning:"자유",             numbers:[7,17],  ascension:95, transform:75, power:70, luck:85 },
+    "구름":  { meaning:"불확실성",         numbers:[5,25],  ascension:55, transform:70, power:40, luck:60 },
+    "바람":  { meaning:"변화",             numbers:[6,26],  ascension:60, transform:90, power:50, luck:70 },
+    "폭풍":  { meaning:"갈등",             numbers:[9,39],  ascension:50, transform:95, power:85, luck:45 },
+    "지진":  { meaning:"인생 전환",        numbers:[8,28],  ascension:45, transform:98, power:95, luck:60 },
+    "산":    { meaning:"목표",             numbers:[5,15],  ascension:90, transform:60, power:80, luck:75 },
+    "숲":    { meaning:"무의식 탐험",      numbers:[3,13],  ascension:65, transform:80, power:55, luck:85 },
+    "나무":  { meaning:"성장",             numbers:[14,34], ascension:80, transform:70, power:60, luck:80 },
+    "꽃":    { meaning:"기쁨",             numbers:[11,21], ascension:75, transform:65, power:40, luck:90 },
+    "장미":  { meaning:"사랑",             numbers:[24,44], ascension:70, transform:70, power:50, luck:85 },
+    "해바라기":{ meaning:"긍정",           numbers:[17,27], ascension:85, transform:60, power:55, luck:95 },
+    "잔디":  { meaning:"안정",             numbers:[4,24],  ascension:60, transform:50, power:45, luck:80 },
     // Animals
-    "뱀": { meaning: "재생·행운", numbers: [8, 18], ascension: 70, transform: 95, power: 65, luck: 90 },
-    "흰 뱀": { meaning: "희귀 행운", numbers: [11, 28], ascension: 85, transform: 95, power: 75, luck: 98 },
-    "검은 뱀": { meaning: "숨겨진 두려움", numbers: [9, 29], ascension: 50, transform: 85, power: 70, luck: 55 },
-    "용": { meaning: "권력", numbers: [8, 38], ascension: 98, transform: 85, power: 98, luck: 95 },
-    "호랑이": { meaning: "강한 에너지", numbers: [17, 37], ascension: 80, transform: 80, power: 95, luck: 85 },
-    "사자": { meaning: "리더십", numbers: [1, 31], ascension: 85, transform: 70, power: 95, luck: 80 },
-    "개": { meaning: "충성", numbers: [14, 24], ascension: 60, transform: 60, power: 50, luck: 85 },
-    "고양이": { meaning: "직감", numbers: [2, 22], ascension: 70, transform: 80, power: 55, luck: 80 },
-    "말": { meaning: "전진", numbers: [7, 27], ascension: 85, transform: 85, power: 80, luck: 85 },
-    "소": { meaning: "재물", numbers: [6, 26], ascension: 55, transform: 55, power: 75, luck: 90 },
-    "돼지": { meaning: "풍요", numbers: [3, 33], ascension: 50, transform: 60, power: 60, luck: 98 },
-    "코끼리": { meaning: "지혜", numbers: [4, 44], ascension: 75, transform: 65, power: 85, luck: 85 },
-    "원숭이": { meaning: "장난·변화", numbers: [5, 25], ascension: 65, transform: 90, power: 55, luck: 70 },
-    "독수리": { meaning: "성공", numbers: [7, 37], ascension: 95, transform: 80, power: 90, luck: 90 },
-    "물고기": { meaning: "재물 운", numbers: [1, 11], ascension: 60, transform: 70, power: 50, luck: 90 },
-    "고래": { meaning: "거대한 기회", numbers: [8, 18], ascension: 85, transform: 85, power: 90, luck: 95 },
-    "상어": { meaning: "경쟁", numbers: [9, 39], ascension: 60, transform: 85, power: 92, luck: 50 },
-    "새": { meaning: "자유", numbers: [17, 27], ascension: 90, transform: 85, power: 50, luck: 85 },
-    "까마귀": { meaning: "경고", numbers: [13, 33], ascension: 55, transform: 75, power: 60, luck: 40 },
-    "나비": { meaning: "변신", numbers: [8, 28], ascension: 85, transform: 98, power: 40, luck: 90 },
-    "벌": { meaning: "노력", numbers: [6, 16], ascension: 70, transform: 75, power: 65, luck: 80 },
-    "거미": { meaning: "얽힘", numbers: [5, 35], ascension: 50, transform: 70, power: 70, luck: 55 },
-    "개미": { meaning: "집단성", numbers: [4, 14], ascension: 60, transform: 65, power: 60, luck: 70 },
-    "사슴": { meaning: "순수", numbers: [12, 32], ascension: 80, transform: 60, power: 45, luck: 85 },
-    "토끼": { meaning: "번식·행운", numbers: [2, 22], ascension: 70, transform: 70, power: 40, luck: 90 },
-
+    "뱀":       { meaning:"재생·행운",      numbers:[8,18],  ascension:70, transform:95, power:65, luck:90 },
+    "흰 뱀":    { meaning:"희귀 행운",      numbers:[11,28], ascension:85, transform:95, power:75, luck:98 },
+    "검은 뱀":  { meaning:"숨겨진 두려움",  numbers:[9,29],  ascension:50, transform:85, power:70, luck:55 },
+    "용":    { meaning:"권력",             numbers:[8,38],  ascension:98, transform:85, power:98, luck:95 },
+    "호랑이":{ meaning:"강한 에너지",      numbers:[17,37], ascension:80, transform:80, power:95, luck:85 },
+    "사자":  { meaning:"리더십",           numbers:[1,31],  ascension:85, transform:70, power:95, luck:80 },
+    "개":    { meaning:"충성",             numbers:[14,24], ascension:60, transform:60, power:50, luck:85 },
+    "고양이":{ meaning:"직감",             numbers:[2,22],  ascension:70, transform:80, power:55, luck:80 },
+    "말":    { meaning:"전진",             numbers:[7,27],  ascension:85, transform:85, power:80, luck:85 },
+    "소":    { meaning:"재물",             numbers:[6,26],  ascension:55, transform:55, power:75, luck:90 },
+    "돼지":  { meaning:"풍요",             numbers:[3,33],  ascension:50, transform:60, power:60, luck:98 },
+    "코끼리":{ meaning:"지혜",             numbers:[4,44],  ascension:75, transform:65, power:85, luck:85 },
+    "원숭이":{ meaning:"장난·변화",        numbers:[5,25],  ascension:65, transform:90, power:55, luck:70 },
+    "독수리":{ meaning:"성공",             numbers:[7,37],  ascension:95, transform:80, power:90, luck:90 },
+    "물고기":{ meaning:"재물 운",          numbers:[1,11],  ascension:60, transform:70, power:50, luck:90 },
+    "고래":  { meaning:"거대한 기회",      numbers:[8,18],  ascension:85, transform:85, power:90, luck:95 },
+    "상어":  { meaning:"경쟁",             numbers:[9,39],  ascension:60, transform:85, power:92, luck:50 },
+    "새":    { meaning:"자유",             numbers:[17,27], ascension:90, transform:85, power:50, luck:85 },
+    "까마귀":{ meaning:"경고",             numbers:[13,33], ascension:55, transform:75, power:60, luck:40 },
+    "나비":  { meaning:"변신",             numbers:[8,28],  ascension:85, transform:98, power:40, luck:90 },
+    "벌":    { meaning:"노력",             numbers:[6,16],  ascension:70, transform:75, power:65, luck:80 },
+    "거미":  { meaning:"얽힘",             numbers:[5,35],  ascension:50, transform:70, power:70, luck:55 },
+    "개미":  { meaning:"집단성",           numbers:[4,14],  ascension:60, transform:65, power:60, luck:70 },
+    "사슴":  { meaning:"순수",             numbers:[12,32], ascension:80, transform:60, power:45, luck:85 },
+    "토끼":  { meaning:"번식·행운",        numbers:[2,22],  ascension:70, transform:70, power:40, luck:90 },
     // People
-    "아이": { meaning: "시작", numbers: [2, 12], ascension: 85, transform: 90, power: 40, luck: 85 },
-    "아기": { meaning: "탄생", numbers: [1, 21], ascension: 90, transform: 95, power: 45, luck: 90 },
-    "어머니": { meaning: "보호", numbers: [6, 26], ascension: 75, transform: 70, power: 70, luck: 90 },
-    "아버지": { meaning: "권위", numbers: [4, 24], ascension: 80, transform: 65, power: 90, luck: 80 },
-    "노인": { meaning: "지혜", numbers: [7, 17], ascension: 85, transform: 60, power: 80, luck: 85 },
-    "죽은 사람": { meaning: "변화", numbers: [4, 44], ascension: 60, transform: 98, power: 50, luck: 70 },
-    "친구": { meaning: "관계", numbers: [14, 34], ascension: 70, transform: 75, power: 50, luck: 80 },
-    "연인": { meaning: "욕망", numbers: [24, 34], ascension: 75, transform: 80, power: 50, luck: 85 },
-    "결혼": { meaning: "결합", numbers: [11, 41], ascension: 85, transform: 90, power: 60, luck: 90 },
-    "임신": { meaning: "가능성", numbers: [2, 32], ascension: 80, transform: 95, power: 55, luck: 90 },
-    "출산": { meaning: "새로운 시작", numbers: [1, 22], ascension: 95, transform: 98, power: 60, luck: 95 },
-    "싸움": { meaning: "갈등", numbers: [9, 19], ascension: 50, transform: 85, power: 85, luck: 40 },
-    "도망": { meaning: "회피", numbers: [5, 15], ascension: 40, transform: 75, power: 30, luck: 35 },
-    "추락": { meaning: "불안", numbers: [13, 23], ascension: 20, transform: 80, power: 25, luck: 30 },
-    "비행": { meaning: "해방", numbers: [7, 37], ascension: 98, transform: 90, power: 60, luck: 95 },
-    "수영": { meaning: "감정 적응", numbers: [6, 16], ascension: 75, transform: 80, power: 55, luck: 85 },
-    "춤": { meaning: "자유", numbers: [17, 27], ascension: 90, transform: 95, power: 50, luck: 90 },
-    "노래": { meaning: "표현", numbers: [3, 13], ascension: 85, transform: 80, power: 50, luck: 85 },
-    "울음": { meaning: "감정 해소", numbers: [4, 14], ascension: 60, transform: 90, power: 40, luck: 75 },
-    "웃음": { meaning: "기쁨", numbers: [11, 21], ascension: 90, transform: 85, power: 50, luck: 95 },
-
+    "아이":      { meaning:"시작",          numbers:[2,12],  ascension:85, transform:90, power:40, luck:85 },
+    "아기":      { meaning:"탄생",          numbers:[1,21],  ascension:90, transform:95, power:45, luck:90 },
+    "어머니":    { meaning:"보호",          numbers:[6,26],  ascension:75, transform:70, power:70, luck:90 },
+    "아버지":    { meaning:"권위",          numbers:[4,24],  ascension:80, transform:65, power:90, luck:80 },
+    "노인":      { meaning:"지혜",          numbers:[7,17],  ascension:85, transform:60, power:80, luck:85 },
+    "죽은 사람": { meaning:"변화",          numbers:[4,44],  ascension:60, transform:98, power:50, luck:70 },
+    "친구":      { meaning:"관계",          numbers:[14,34], ascension:70, transform:75, power:50, luck:80 },
+    "연인":      { meaning:"욕망",          numbers:[24,34], ascension:75, transform:80, power:50, luck:85 },
+    "결혼":      { meaning:"결합",          numbers:[11,41], ascension:85, transform:90, power:60, luck:90 },
+    "임신":      { meaning:"가능성",        numbers:[2,32],  ascension:80, transform:95, power:55, luck:90 },
+    "출산":      { meaning:"새로운 시작",   numbers:[1,22],  ascension:95, transform:98, power:60, luck:95 },
+    "싸움":      { meaning:"갈등",          numbers:[9,19],  ascension:50, transform:85, power:85, luck:40 },
+    "도망":      { meaning:"회피",          numbers:[5,15],  ascension:40, transform:75, power:30, luck:35 },
+    "추락":      { meaning:"불안",          numbers:[13,23], ascension:20, transform:80, power:25, luck:30 },
+    "비행":      { meaning:"해방",          numbers:[7,37],  ascension:98, transform:90, power:60, luck:95 },
+    "수영":      { meaning:"감정 적응",     numbers:[6,16],  ascension:75, transform:80, power:55, luck:85 },
+    "춤":        { meaning:"자유",          numbers:[17,27], ascension:90, transform:95, power:50, luck:90 },
+    "노래":      { meaning:"표현",          numbers:[3,13],  ascension:85, transform:80, power:50, luck:85 },
+    "울음":      { meaning:"감정 해소",     numbers:[4,14],  ascension:60, transform:90, power:40, luck:75 },
+    "웃음":      { meaning:"기쁨",          numbers:[11,21], ascension:90, transform:85, power:50, luck:95 },
     // Places
-    "집": { meaning: "자아", numbers: [4, 14], ascension: 70, transform: 60, power: 65, luck: 80 },
-    "큰 집": { meaning: "성공 욕구", numbers: [8, 28], ascension: 85, transform: 70, power: 85, luck: 90 },
-    "빈집": { meaning: "외로움", numbers: [5, 25], ascension: 50, transform: 65, power: 40, luck: 45 },
-    "학교": { meaning: "배움", numbers: [7, 17], ascension: 80, transform: 85, power: 60, luck: 75 },
-    "병원": { meaning: "치유", numbers: [6, 26], ascension: 75, transform: 90, power: 55, luck: 85 },
-    "교회": { meaning: "영성", numbers: [11, 31], ascension: 90, transform: 75, power: 65, luck: 90 },
-    "절": { meaning: "명상", numbers: [12, 32], ascension: 85, transform: 80, power: 60, luck: 85 },
-    "무덤": { meaning: "끝·시작", numbers: [4, 44], ascension: 55, transform: 98, power: 50, luck: 60 },
-    "다리": { meaning: "연결", numbers: [14, 24], ascension: 80, transform: 90, power: 65, luck: 85 },
-    "길": { meaning: "인생 방향", numbers: [6, 16], ascension: 75, transform: 85, power: 60, luck: 80 },
-    "터널": { meaning: "전환", numbers: [8, 18], ascension: 65, transform: 95, power: 60, luck: 75 },
-    "계단": { meaning: "상승", numbers: [5, 15], ascension: 95, transform: 85, power: 70, luck: 80 },
-    "엘리베이터": { meaning: "급변화", numbers: [9, 29], ascension: 90, transform: 98, power: 75, luck: 85 },
-    "시장": { meaning: "기회", numbers: [3, 33], ascension: 70, transform: 85, power: 65, luck: 90 },
-    "은행": { meaning: "재물", numbers: [8, 38], ascension: 80, transform: 70, power: 90, luck: 95 },
-    "호텔": { meaning: "임시 상태", numbers: [5, 35], ascension: 75, transform: 80, power: 60, luck: 75 },
-    "공항": { meaning: "이동", numbers: [17, 27], ascension: 90, transform: 95, power: 70, luck: 85 },
-    "바다 마을": { meaning: "감정 안정", numbers: [21, 41], ascension: 80, transform: 75, power: 55, luck: 90 },
-    "성": { meaning: "권력", numbers: [8, 48], ascension: 95, transform: 70, power: 98, luck: 90 },
-    "감옥": { meaning: "억압", numbers: [13, 43], ascension: 30, transform: 60, power: 45, luck: 25 },
-
+    "집":      { meaning:"자아",          numbers:[4,14],  ascension:70, transform:60, power:65, luck:80 },
+    "큰 집":   { meaning:"성공 욕구",     numbers:[8,28],  ascension:85, transform:70, power:85, luck:90 },
+    "빈집":    { meaning:"외로움",        numbers:[5,25],  ascension:50, transform:65, power:40, luck:45 },
+    "학교":    { meaning:"배움",          numbers:[7,17],  ascension:80, transform:85, power:60, luck:75 },
+    "병원":    { meaning:"치유",          numbers:[6,26],  ascension:75, transform:90, power:55, luck:85 },
+    "교회":    { meaning:"영성",          numbers:[11,31], ascension:90, transform:75, power:65, luck:90 },
+    "절":      { meaning:"명상",          numbers:[12,32], ascension:85, transform:80, power:60, luck:85 },
+    "무덤":    { meaning:"끝·시작",       numbers:[4,44],  ascension:55, transform:98, power:50, luck:60 },
+    "다리":    { meaning:"연결",          numbers:[14,24], ascension:80, transform:90, power:65, luck:85 },
+    "길":      { meaning:"인생 방향",     numbers:[6,16],  ascension:75, transform:85, power:60, luck:80 },
+    "터널":    { meaning:"전환",          numbers:[8,18],  ascension:65, transform:95, power:60, luck:75 },
+    "계단":    { meaning:"상승",          numbers:[5,15],  ascension:95, transform:85, power:70, luck:80 },
+    "엘리베이터":{ meaning:"급변화",      numbers:[9,29],  ascension:90, transform:98, power:75, luck:85 },
+    "시장":    { meaning:"기회",          numbers:[3,33],  ascension:70, transform:85, power:65, luck:90 },
+    "은행":    { meaning:"재물",          numbers:[8,38],  ascension:80, transform:70, power:90, luck:95 },
+    "호텔":    { meaning:"임시 상태",     numbers:[5,35],  ascension:75, transform:80, power:60, luck:75 },
+    "공항":    { meaning:"이동",          numbers:[17,27], ascension:90, transform:95, power:70, luck:85 },
+    "바다 마을":{ meaning:"감정 안정",    numbers:[21,41], ascension:80, transform:75, power:55, luck:90 },
+    "성":      { meaning:"권력",          numbers:[8,48],  ascension:95, transform:70, power:98, luck:90 },
+    "감옥":    { meaning:"억압",          numbers:[13,43], ascension:30, transform:60, power:45, luck:25 },
     // Items
-    "돈": { meaning: "재물", numbers: [3, 33], ascension: 70, transform: 75, power: 85, luck: 98 },
-    "금": { meaning: "성공", numbers: [8, 38], ascension: 85, transform: 70, power: 95, luck: 98 },
-    "은": { meaning: "직관", numbers: [7, 27], ascension: 80, transform: 80, power: 75, luck: 90 },
-    "열쇠": { meaning: "기회", numbers: [11, 31], ascension: 90, transform: 95, power: 80, luck: 95 },
-    "문": { meaning: "전환", numbers: [14, 24], ascension: 85, transform: 98, power: 65, luck: 90 },
-    "창문": { meaning: "시야", numbers: [17, 37], ascension: 80, transform: 80, power: 60, luck: 85 },
-    "거울": { meaning: "자아 인식", numbers: [2, 22], ascension: 75, transform: 90, power: 50, luck: 80 },
-    "시계": { meaning: "시간 압박", numbers: [12, 42], ascension: 60, transform: 75, power: 65, luck: 50 },
-    "전화": { meaning: "소식", numbers: [5, 15], ascension: 70, transform: 85, power: 60, luck: 80 },
-    "자동차": { meaning: "인생 진행", numbers: [7, 17], ascension: 80, transform: 85, power: 80, luck: 85 },
-
+    "돈":      { meaning:"재물",          numbers:[3,33],  ascension:70, transform:75, power:85, luck:98 },
+    "금":      { meaning:"성공",          numbers:[8,38],  ascension:85, transform:70, power:95, luck:98 },
+    "은":      { meaning:"직관",          numbers:[7,27],  ascension:80, transform:80, power:75, luck:90 },
+    "열쇠":    { meaning:"기회",          numbers:[11,31], ascension:90, transform:95, power:80, luck:95 },
+    "문":      { meaning:"전환",          numbers:[14,24], ascension:85, transform:98, power:65, luck:90 },
+    "창문":    { meaning:"시야",          numbers:[17,37], ascension:80, transform:80, power:60, luck:85 },
+    "거울":    { meaning:"자아 인식",     numbers:[2,22],  ascension:75, transform:90, power:50, luck:80 },
+    "시계":    { meaning:"시간 압박",     numbers:[12,42], ascension:60, transform:75, power:65, luck:50 },
+    "전화":    { meaning:"소식",          numbers:[5,15],  ascension:70, transform:85, power:60, luck:80 },
+    "자동차":  { meaning:"인생 진행",     numbers:[7,17],  ascension:80, transform:85, power:80, luck:85 },
     // Special
-    "UFO": { meaning: "미지의 변화", numbers: [27], ascension: 95, transform: 98, power: 85, luck: 90 },
-    "외계인": { meaning: "낯선 가능성", numbers: [37], ascension: 90, transform: 95, power: 80, luck: 85 },
-    "보물상자": { meaning: "숨겨진 재능", numbers: [33], ascension: 85, transform: 85, power: 75, luck: 98 },
-    "왕관": { meaning: "권력", numbers: [41], ascension: 98, transform: 75, power: 98, luck: 95 },
-    "칼": { meaning: "결단", numbers: [29], ascension: 75, transform: 90, power: 90, luck: 70 },
-    "총": { meaning: "긴장", numbers: [39], ascension: 60, transform: 85, power: 95, luck: 50 },
-    "반지": { meaning: "약속", numbers: [24], ascension: 75, transform: 80, power: 65, luck: 90 },
-    "목걸이": { meaning: "관계", numbers: [14], ascension: 70, transform: 75, power: 60, luck: 85 },
-    "보석": { meaning: "가치", numbers: [38], ascension: 85, transform: 70, power: 90, luck: 98 },
-    "촛불": { meaning: "희망", numbers: [17], ascension: 85, transform: 75, power: 50, luck: 90 }
+    "UFO":      { meaning:"미지의 변화",  numbers:[27],    ascension:95, transform:98, power:85, luck:90 },
+    "외계인":   { meaning:"낯선 가능성",  numbers:[37],    ascension:90, transform:95, power:80, luck:85 },
+    "보물상자":  { meaning:"숨겨진 재능", numbers:[33],    ascension:85, transform:85, power:75, luck:98 },
+    "왕관":     { meaning:"권력",         numbers:[41],    ascension:98, transform:75, power:98, luck:95 },
+    "칼":       { meaning:"결단",         numbers:[29],    ascension:75, transform:90, power:90, luck:70 },
+    "총":       { meaning:"긴장",         numbers:[39],    ascension:60, transform:85, power:95, luck:50 },
+    "반지":     { meaning:"약속",         numbers:[24],    ascension:75, transform:80, power:65, luck:90 },
+    "목걸이":   { meaning:"관계",         numbers:[14],    ascension:70, transform:75, power:60, luck:85 },
+    "보석":     { meaning:"가치",         numbers:[38],    ascension:85, transform:70, power:90, luck:98 },
+    "촛불":     { meaning:"희망",         numbers:[17],    ascension:85, transform:75, power:50, luck:90 }
 };
 
-function analyzeDream(){
+/* ═══════════════════════════════════════
+   KOREAN JOSA STRIPPING — 조사 제거 전처리
+   입력 텍스트에서 조사를 제거하여 어근만 남깁니다.
+   예) "용이 날았다" → "용 날았다" (매칭 용이)
+   ═══════════════════════════════════════ */
+function stripJosa(text) {
+    // 공백 없이 붙는 조사 패턴 (가장 긴 것부터 매칭)
+    const josaPatterns = [
+        // 복합 조사 (긴 것 우선)
+        '에서부터','으로부터','로부터','에서도','에게서','한테서',
+        '이라고','이라는','이라도','이라면','이라서','이지만','이지요',
+        '라고도','라고는','라고만','라고서','라는데','라도','라면서',
+        '이라고','이라는','이고도','이고는','이고만',
+        '에게도','에게만','에게서','에게는',
+        '에서는','에서만','에서도',
+        '으로는','으로만','으로도',
+        '에서','에게','한테','에도','에만','에는','에서',
+        '로서','로써','로도','로만','로는',
+        '으로','으로서','으로써',
+        '이라','이며','이고','이나','이랑','이든','이든지',
+        '과는','과도','과만','와는','와도','와만',
+        '이와','이과',
+        '까지도','까지는','까지만',
+        '부터도','부터는','부터만',
+        '만큼도','만큼은',
+        '처럼도','처럼은',
+        '보다도','보다는',
+        '마다도','마다는',
+        '까지','부터','만큼','처럼','보다','마다','이든',
+        '이랑','이나','이며','이고',
+        '과','와','의','을','를','이','가','은','는',
+        '도','만','야','아','여','요','죠'
+    ];
+
+    // 각 조사를 단어 경계 뒤에서 제거
+    let result = text;
+    // 조사 뒤에 공백, 문장부호, 또는 문자열 끝이 오는 경우만 제거
+    for (const j of josaPatterns) {
+        const escaped = j.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const re = new RegExp(`(\\S+?)${escaped}(?=[\\s,.!?。，、·…\\n]|$)`, 'g');
+        result = result.replace(re, (match, stem) => stem + ' ');
+    }
+    return result;
+}
+
+/* ═══════════════════════════════════════
+   SYMBOL MATCHING — Longest-match greedy
+   조사 제거 후 텍스트와 원본 텍스트 모두에서 탐색.
+   더 긴 키를 먼저 매칭하고 해당 위치를 소거해 중복 방지.
+   ═══════════════════════════════════════ */
+function matchSymbols(rawText) {
+    const strippedText = stripJosa(rawText);
+    // 두 텍스트를 합쳐서 탐색 (원본도 유지 — 띄어쓰기 포함 복합어 처리)
+    const searchTexts = [rawText, strippedText];
+
+    // 키를 길이 내림차순으로 정렬 (긴 것 우선)
+    const sortedKeys = Object.keys(symbolDB).sort((a, b) => b.length - a.length);
+
+    const found = [];
+    const usedKeys = new Set();
+
+    // 각 텍스트에서 탐색
+    for (const src of searchTexts) {
+        let workText = src;
+        for (const key of sortedKeys) {
+            if (usedKeys.has(key)) continue;
+            const idx = workText.indexOf(key);
+            if (idx !== -1) {
+                found.push(key);
+                usedKeys.add(key);
+                // 해당 위치를 소거하여 서브스트링 중복 히트 방지
+                workText = workText.slice(0, idx) + '　'.repeat(key.length) + workText.slice(idx + key.length);
+            }
+        }
+    }
+
+    return found;
+}
+
+/* ═══════════════════════════════════════
+   GENERATE DREAM CODE
+   ═══════════════════════════════════════ */
+function generateCode(found){
+    let hash = 0;
+    const str = found.join('');
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0;
+    }
+    return "DRM-" + Math.abs(hash).toString(16).toUpperCase().padStart(8, '0').slice(0, 8);
+}
+
+/* ═══════════════════════════════════════
+   ANIMATE SCORE NUMBER
+   ═══════════════════════════════════════ */
+function animateScore(el, target){
+    const start = Date.now();
+    const duration = 1000;
+    function step(){
+        const elapsed = Date.now() - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(target * ease) + '%';
+        if(progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+}
+
+/* ═══════════════════════════════════════
+   DREAM CARD — Claude AI SVG 생성
+   감지된 상징을 바탕으로 꿈의 분위기를 담은
+   SVG 일러스트 카드를 AI가 직접 그립니다.
+   ═══════════════════════════════════════ */
+
+// 로딩 중 보여줄 펄스 애니메이션 카드
+function showDreamCardLoading(container) {
+    container.innerHTML = `
+        <div class="dream-visual-badge">✦ 꿈 카드 생성 중...</div>
+        <div style="flex:1; display:flex; align-items:center; justify-content:center; min-height:200px;">
+            <svg viewBox="0 0 120 80" width="120" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="20" cy="40" r="6" fill="#7c3aed" opacity="0.8">
+                    <animate attributeName="r" values="6;10;6" dur="1s" begin="0s" repeatCount="indefinite"/>
+                    <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1s" begin="0s" repeatCount="indefinite"/>
+                </circle>
+                <circle cx="60" cy="40" r="6" fill="#a78bfa" opacity="0.8">
+                    <animate attributeName="r" values="6;10;6" dur="1s" begin="0.33s" repeatCount="indefinite"/>
+                    <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1s" begin="0.33s" repeatCount="indefinite"/>
+                </circle>
+                <circle cx="100" cy="40" r="6" fill="#22d3ee" opacity="0.8">
+                    <animate attributeName="r" values="6;10;6" dur="1s" begin="0.66s" repeatCount="indefinite"/>
+                    <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1s" begin="0.66s" repeatCount="indefinite"/>
+                </circle>
+            </svg>
+        </div>
+    `;
+}
+
+// 폴백: API 실패 시 상징 기반 SVG 생성
+function buildFallbackSVG(foundSymbols, dreamText) {
+    const s = foundSymbols[0] || '무의식';
+    const db = symbolDB[s] || {};
+
+    // 상징별 테마 색상
+    const themeMap = {
+        '용':'#f59e0b,#ef4444', '태양':'#fbbf24,#f97316', '불':'#ef4444,#f97316',
+        '바다':'#0ea5e9,#0284c7', '물':'#38bdf8,#06b6d4', '달':'#c4b5fd,#8b5cf6',
+        '별':'#fde68a,#a78bfa', '하늘':'#7dd3fc,#38bdf8', '산':'#6ee7b7,#059669',
+        '숲':'#4ade80,#16a34a', '꽃':'#f9a8d4,#ec4899', '장미':'#fb7185,#e11d48',
+        '뱀':'#86efac,#22c55e', '나비':'#c4b5fd,#f0abfc', '새':'#7dd3fc,#e879f9',
+        '돼지':'#fca5a5,#fb923c', '돈':'#fcd34d,#f59e0b', '금':'#fbbf24,#d97706',
+        '보석':'#a78bfa,#ec4899', '왕관':'#fde68a,#eab308',
+    };
+    const colorKey = Object.keys(themeMap).find(k => foundSymbols.includes(k));
+    const [c1, c2] = (themeMap[colorKey] || '#7c3aed,#22d3ee').split(',');
+
+    // 상징에 따른 도형 패턴
+    const waterSymbols = ['물','바다','강','폭포','비','수영'];
+    const fireSymbols  = ['불','태양','번개','용'];
+    const skySymbols   = ['하늘','별','달','새','비행','구름'];
+    const earthSymbols = ['산','숲','나무','꽃','잔디'];
+    const animalSyms   = ['뱀','호랑이','용','사자','독수리','나비','고래'];
+
+    let shapesHTML = '';
+
+    if (foundSymbols.some(x => waterSymbols.includes(x))) {
+        shapesHTML = `
+            <path d="M10 110 Q40 80, 70 110 Q100 140, 130 110 Q160 80, 190 110 Q220 140, 250 110" stroke="${c1}" stroke-width="3" fill="none" opacity="0.9"/>
+            <path d="M10 130 Q50 100, 90 130 Q130 160, 170 130 Q210 100, 250 130" stroke="${c2}" stroke-width="2" fill="none" opacity="0.7"/>
+            <ellipse cx="125" cy="75" rx="38" ry="38" fill="rgba(125,211,252,0.18)" stroke="${c1}" stroke-width="1.5"/>
+            <circle cx="125" cy="75" r="18" fill="url(#gc)" opacity="0.85"/>`;
+    } else if (foundSymbols.some(x => fireSymbols.includes(x))) {
+        shapesHTML = `
+            <path d="M125 150 C100 120, 85 90, 100 60 C110 35, 125 25, 125 25 C125 25, 140 35, 150 60 C165 90, 150 120, 125 150Z" fill="url(#gc)" opacity="0.9"/>
+            <path d="M125 140 C110 115, 102 95, 112 72 C118 55, 125 48, 125 48 C125 48, 132 55, 138 72 C148 95, 140 115, 125 140Z" fill="${c2}" opacity="0.7"/>
+            <circle cx="90" cy="45" r="8" fill="${c1}" opacity="0.6"/>
+            <circle cx="162" cy="60" r="5" fill="${c2}" opacity="0.7"/>`;
+    } else if (foundSymbols.some(x => skySymbols.includes(x))) {
+        shapesHTML = `
+            <circle cx="125" cy="80" r="35" fill="url(#gc)" opacity="0.85"/>
+            <circle cx="125" cy="80" r="22" fill="rgba(15,23,42,0.5)"/>
+            ${[...Array(8)].map((_,i) => {
+                const a = (i/8)*Math.PI*2;
+                const x1=125+30*Math.cos(a), y1=80+30*Math.sin(a);
+                const x2=125+55*Math.cos(a), y2=80+55*Math.sin(a);
+                return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${c1}" stroke-width="2" opacity="0.6"/>`;
+            }).join('')}
+            <circle cx="68" cy="42" r="4" fill="${c2}" opacity="0.9"/>
+            <circle cx="180" cy="52" r="3" fill="${c1}" opacity="0.8"/>
+            <circle cx="155" cy="130" r="5" fill="${c2}" opacity="0.7"/>`;
+    } else if (foundSymbols.some(x => earthSymbols.includes(x))) {
+        shapesHTML = `
+            <path d="M30 150 Q80 80, 125 70 Q170 80, 220 150" fill="rgba(34,197,94,0.15)" stroke="${c1}" stroke-width="2"/>
+            <circle cx="125" cy="70" r="30" fill="url(#gc)" opacity="0.8"/>
+            <line x1="125" y1="100" x2="125" y2="150" stroke="${c1}" stroke-width="3" stroke-linecap="round"/>
+            <line x1="105" y1="120" x2="125" y2="105" stroke="${c2}" stroke-width="2"/>
+            <line x1="145" y1="115" x2="125" y2="102" stroke="${c2}" stroke-width="2"/>`;
+    } else {
+        // 기본 — 상징 이니셜 + 오라 원
+        shapesHTML = `
+            <circle cx="125" cy="85" r="52" fill="rgba(124,58,237,0.1)" stroke="${c1}" stroke-width="1" stroke-dasharray="4 4"/>
+            <circle cx="125" cy="85" r="36" fill="url(#gc)" opacity="0.85"/>
+            <circle cx="125" cy="85" r="20" fill="rgba(15,23,42,0.6)"/>
+            <text x="125" y="92" text-anchor="middle" fill="white" font-size="20" font-family="serif" opacity="0.9">${s.charAt(0)}</text>
+            <circle cx="72" cy="50" r="6" fill="${c2}" opacity="0.7"/>
+            <circle cx="178" cy="58" r="4" fill="${c1}" opacity="0.8"/>
+            <circle cx="160" cy="128" r="7" fill="${c2}" opacity="0.6"/>`;
+    }
+
+    const meaning = db.meaning || '무의식';
+    const shortDream = dreamText.slice(0, 22) + (dreamText.length > 22 ? '…' : '');
+
+    return `<svg viewBox="0 0 250 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;filter:drop-shadow(0 0 20px rgba(124,58,237,0.25));">
+        <defs>
+            <linearGradient id="gc" x1="0" x2="1" y1="0" y2="1">
+                <stop offset="0%" stop-color="${c1}"/>
+                <stop offset="100%" stop-color="${c2}"/>
+            </linearGradient>
+            <radialGradient id="bgRad" cx="50%" cy="30%" r="70%">
+                <stop offset="0%" stop-color="rgba(124,58,237,0.18)"/>
+                <stop offset="100%" stop-color="rgba(2,6,23,0)"/>
+            </radialGradient>
+        </defs>
+        <rect width="250" height="180" rx="20" fill="rgba(10,16,32,0.97)" stroke="rgba(148,163,184,0.12)"/>
+        <rect width="250" height="180" rx="20" fill="url(#bgRad)"/>
+        ${shapesHTML}
+        <rect x="0" y="148" width="250" height="32" rx="0" fill="rgba(5,9,18,0.88)"/>
+        <rect x="0" y="148" width="250" height="1" fill="rgba(255,255,255,0.08)"/>
+        <text x="14" y="162" fill="${c1}" font-size="9" font-family="monospace" letter-spacing="1" opacity="0.9">${s} · ${meaning}</text>
+        <text x="14" y="174" fill="rgba(148,163,184,0.7)" font-size="8" font-family="monospace">${shortDream}</text>
+        <text x="236" y="174" text-anchor="end" fill="rgba(148,163,184,0.4)" font-size="7" font-family="monospace">DREAM LOTTO</text>
+    </svg>`;
+}
+
+async function renderDreamVisual(foundSymbols, finalNumbers, dreamText) {
+    const dreamVisual = document.getElementById('dreamVisual');
+    showDreamCardLoading(dreamVisual);
+
+    const symbolDesc = foundSymbols.slice(0, 4).map(s => `${s}(${symbolDB[s]?.meaning||'무의식'})`).join(', ');
+    const prompt = `당신은 SVG 아티스트입니다. 아래 꿈의 상징을 시각적으로 표현한 SVG 이미지 카드를 만들어 주세요.
+
+꿈 내용: "${dreamText.slice(0,80)}"
+핵심 상징: ${symbolDesc}
+
+요구사항:
+- viewBox="0 0 250 180" 크기의 완성된 <svg> 태그 하나만 출력
+- 어두운 우주/꿈 분위기 배경 (딥 네이비, 보라, 청록 계열)
+- 꿈 상징을 직관적으로 표현하는 도형/패턴/아이콘 (추상적이어도 OK)
+- 그라데이션, 글로우 효과 적극 활용
+- 하단 바에 상징 이름과 의미 표시 (한글 OK, font-family="sans-serif")
+- 애니메이션 없이 정적 SVG
+- xmlns="http://www.w3.org/2000/svg" 포함
+- 다른 설명 없이 <svg>...</svg>만 출력`;
+
+    try {
+        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'claude-sonnet-4-20250514',
+                max_tokens: 1000,
+                messages: [{ role: 'user', content: prompt }]
+            })
+        });
+
+        if (!resp.ok) throw new Error('api');
+        const data = await resp.json();
+        const raw = (data.content || []).map(b => b.text || '').join('');
+
+        // SVG 태그 추출
+        const match = raw.match(/<svg[\s\S]*?<\/svg>/i);
+        if (!match) throw new Error('no svg');
+
+        let svgHTML = match[0];
+        // 크기 강제 지정
+        svgHTML = svgHTML.replace(/<svg/, '<svg style="width:100%;height:auto;filter:drop-shadow(0 0 20px rgba(124,58,237,0.25));"');
+
+        dreamVisual.innerHTML = `
+            <div class="dream-visual-badge">✦ AI 꿈 카드</div>
+            <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:4px 0 0;">
+                ${svgHTML}
+            </div>`;
+
+        // 공유 카드에도 동일 SVG 삽입
+        const shareImgSlot = document.getElementById('shareCardImage');
+        if (shareImgSlot) shareImgSlot.innerHTML = svgHTML;
+
+    } catch(e) {
+        // 폴백 SVG
+        const fallback = buildFallbackSVG(foundSymbols, dreamText);
+        dreamVisual.innerHTML = `
+            <div class="dream-visual-badge">Future Dream</div>
+            <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:4px 0 0;">
+                ${fallback}
+            </div>`;
+        const shareImgSlot = document.getElementById('shareCardImage');
+        if (shareImgSlot) shareImgSlot.innerHTML = fallback;
+    }
+}
+
+/* ═══════════════════════════════════════
+   CLAUDE AI INTERPRETATION — 스트리밍 해석
+   ═══════════════════════════════════════ */
+async function fetchAIInterpretation(dreamText, foundSymbols, scores) {
+    const analysisEl = document.getElementById('analysis');
+    analysisEl.innerHTML = '<span style="color:#64748b;">✦ AI 해몽 중...</span>';
+
+    const symbolSummary = foundSymbols.length > 0
+        ? foundSymbols.map(s => `${s}(${symbolDB[s]?.meaning || '무의식'})`).join(', ')
+        : '(감지된 상징 없음 — 무의식 에너지)';
+
+    const prompt = `당신은 꿈 해몽 전문가입니다. 아래 꿈을 분석해 주세요.
+
+꿈 내용:
+"${dreamText}"
+
+감지된 상징: ${symbolSummary}
+분석 점수 — 상승: ${scores.ascension}%, 변화: ${scores.transform}%, 권력: ${scores.power}%, 행운: ${scores.luck}%
+
+다음 형식으로 꿈 해몽을 작성하세요 (HTML 사용 가능, 총 150~200자 이내):
+1. 꿈의 핵심 메시지를 한 문장으로 시작
+2. 주요 상징이 나타내는 의미 (2~3개)
+3. 현재 삶에서의 적용 조언 한 줄
+4. 행운 한마디
+
+간결하고 신비로우면서도 실질적으로 작성하세요. 마크다운 없이 HTML만 사용하세요.`;
+
+    try {
+        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'claude-sonnet-4-20250514',
+                max_tokens: 1000,
+                stream: true,
+                messages: [{ role: 'user', content: prompt }]
+            })
+        });
+
+        if (!resp.ok) throw new Error('API error');
+
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let accumulated = '';
+        analysisEl.innerHTML = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split('\n');
+            for (const line of lines) {
+                if (!line.startsWith('data: ')) continue;
+                const data = line.slice(6).trim();
+                if (data === '[DONE]') continue;
+                try {
+                    const parsed = JSON.parse(data);
+                    if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+                        accumulated += parsed.delta.text;
+                        analysisEl.innerHTML = accumulated;
+                    }
+                } catch {}
+            }
+        }
+
+        if (!accumulated.trim()) throw new Error('empty');
+    } catch (e) {
+        // Fallback to static interpretation
+        const symbolNames = foundSymbols.filter(s => s !== '무의식').join(', ');
+        analysisEl.innerHTML = foundSymbols.length === 0
+            ? `무의식 깊은 곳의 에너지가 활성화되어 있습니다. 아직 언어화되지 않은 감정과 가능성이 움트는 시기입니다.<br><br>지금은 내면의 목소리에 귀를 기울일 때입니다.`
+            : `<b>${symbolNames}</b> 상징이 강하게 발현된 꿈입니다.<br><br>${
+                foundSymbols.slice(0, 2).map(s => `<b>${s}</b>은(는) ${symbolDB[s]?.meaning || '변화'}을 상징하며, 현실에서 중요한 전환점이 가까워졌음을 암시합니다.`).join('<br>')
+              }<br><br>행운의 흐름이 당신 곁에 있습니다. 오늘 하루 주변의 작은 신호에 집중해보세요.`;
+    }
+}
+
+/* ═══════════════════════════════════════
+   MAIN: ANALYZE DREAM
+   ═══════════════════════════════════════ */
+async function analyzeDream(){
     const text = document.getElementById('dreamInput').value.trim();
     if(!text){
-        alert('꿈 내용을 입력하세요.');
+        showToast('꿈 내용을 입력하세요.');
+        document.getElementById('dreamInput').focus();
         return;
     }
 
-    let foundSymbols = [];
+    const btn = document.getElementById('dreamAnalyzeBtn');
+    btn.classList.add('loading');
+    btn.textContent = '분석 중...';
+    btn.disabled = true;
+
+    try {
+        await _doAnalysis(text);
+    } finally {
+        btn.classList.remove('loading');
+        btn.textContent = '꿈 분석하기';
+        btn.disabled = false;
+    }
+}
+
+async function _doAnalysis(text){
+    // ── 1. 상징 매칭 (조사 제거 + 최장일치) ──
+    let foundSymbols = matchSymbols(text);
+
     let numbers = [];
-    let ascension = 0, transform = 0, power = 0, luck = 0;
+    let ascSum = 0, traSum = 0, powSum = 0, lucSum = 0;
 
-    for(let key in symbolDB){
-        if(text.includes(key)){
-            foundSymbols.push(key);
-            numbers.push(...symbolDB[key].numbers);
-            ascension += symbolDB[key].ascension;
-            transform += symbolDB[key].transform;
-            power += symbolDB[key].power;
-            luck += symbolDB[key].luck;
+    if (foundSymbols.length > 0) {
+        for (const key of foundSymbols) {
+            const db = symbolDB[key];
+            if (!db) continue;
+            numbers.push(...db.numbers);
+            ascSum += db.ascension;
+            traSum += db.transform;
+            powSum += db.power;
+            lucSum += db.luck;
         }
     }
 
-    if(foundSymbols.length === 0){
+    const isDefault = foundSymbols.length === 0;
+    if (isDefault) {
         foundSymbols.push("무의식");
-        numbers=[7,11,18,21,28,33,44];
-        ascension=70; transform=70; power=70; luck=70;
+        numbers = [7, 11, 18, 21, 28, 33, 44];
+        ascSum = traSum = powSum = lucSum = 70;
     }
 
-    // --- Advanced Hybrid Number Generation ---
-    let finalNumbers = [...new Set(numbers)];
+    // ── 2. 로또 번호 생성 ──
+    let finalNumbers = [...new Set(numbers.filter(n => n >= 1 && n <= 45))];
     const MAX_LOTTO = 45;
-    const TARGET_COUNT = 7; 
-
-    while(finalNumbers.length < TARGET_COUNT){
-        const randomBuffer = new Uint32Array(1);
-        crypto.getRandomValues(randomBuffer);
-        const randNum = (randomBuffer[0] % MAX_LOTTO) + 1;
-        if(!finalNumbers.includes(randNum)){
-            finalNumbers.push(randNum);
-        }
+    const TARGET_COUNT = 7;
+    let safety = 0;
+    while(finalNumbers.length < TARGET_COUNT && safety < 300){
+        safety++;
+        const buf = new Uint32Array(1);
+        crypto.getRandomValues(buf);
+        const randNum = (buf[0] % MAX_LOTTO) + 1;
+        if(!finalNumbers.includes(randNum)) finalNumbers.push(randNum);
     }
-    finalNumbers = finalNumbers.slice(0, TARGET_COUNT).sort((a,b)=>a-b);
+    finalNumbers = finalNumbers.slice(0, TARGET_COUNT).sort((a, b) => a - b);
 
+    // ── 3. 점수 계산 ──
     const count = foundSymbols.length;
-    ascension = Math.floor(ascension/count);
-    transform = Math.floor(transform/count);
-    power = Math.floor(power/count);
-    luck = Math.floor(luck/count);
+    const ascension = Math.min(100, Math.floor(ascSum / count));
+    const transform = Math.min(100, Math.floor(traSum / count));
+    const power     = Math.min(100, Math.floor(powSum / count));
+    const luck      = Math.min(100, Math.floor(lucSum / count));
 
-    document.getElementById("analysis").innerHTML = `
-        당신의 꿈은 <b>${foundSymbols.join(", ")}</b> 상징이 강하게 활성화된 구조입니다.<br><br>
-        이 꿈은 상승, 변화, 잠재력 개방, 무의식 확장과 연결됩니다.
-    `;
-
+    // ── 4. 상징 태그 렌더 ──
     const symbolArea = document.getElementById("symbols");
-    symbolArea.innerHTML="";
-    foundSymbols.forEach(sym=>{
+    symbolArea.innerHTML = "";
+    foundSymbols.forEach((sym, i) => {
         const div = document.createElement("div");
-        div.className="symbol";
-        div.innerHTML=`${sym} · ${symbolDB[sym]?.meaning || "무의식"}`;
+        div.className = "symbol";
+        div.style.animationDelay = (i * 0.07) + 's';
+        div.innerHTML = `${sym} · ${symbolDB[sym]?.meaning || "무의식"}`;
         symbolArea.appendChild(div);
     });
 
+    // ── 5. 로또 볼 렌더 ──
     const numArea = document.getElementById("numbers");
-    numArea.innerHTML="";
-    finalNumbers.forEach(n=>{
+    numArea.innerHTML = "";
+    finalNumbers.forEach((n, i) => {
         const div = document.createElement("div");
-        div.className="ball";
-        div.textContent=n;
+        div.className = "ball";
+        div.textContent = n;
+        div.style.animationDelay = (i * 0.15) + 's';
+        div.setAttribute('aria-label', `번호 ${n}`);
         numArea.appendChild(div);
     });
 
-    document.getElementById("emotionText").innerHTML = `감정 강도 ${luck}%`;
-    document.getElementById("energyFill").style.width = luck + "%";
+    // ── 6. 감정 에너지 바 ──
+    document.getElementById("emotionText").innerHTML = `감정 강도 <b>${luck}%</b>`;
+    const energyFill = document.getElementById("energyFill");
+    const energyBar  = document.getElementById("energyBar");
+    energyFill.style.width = "0%";
+    energyBar.setAttribute('aria-valuenow', luck);
+    setTimeout(() => { energyFill.style.width = luck + "%"; }, 50);
 
-    document.getElementById('ascensionScore').innerText = ascension + '%';
-    document.getElementById('transformScore').innerText = transform + '%';
-    document.getElementById('powerScore').innerText = power + '%';
-    document.getElementById('luckScore').innerText = luck + '%';
-    
+    // ── 7. 아키타입 점수 애니메이션 ──
+    animateScore(document.getElementById('ascensionScore'), ascension);
+    animateScore(document.getElementById('transformScore'), transform);
+    animateScore(document.getElementById('powerScore'),     power);
+    animateScore(document.getElementById('luckScore'),      luck);
+
+    // ── 8. 드림 코드 ──
     const code = generateCode(foundSymbols);
-    document.getElementById('dreamCode').innerText = code;
+    document.getElementById('dreamCode').textContent = code;
 
-    const dreamVisual = document.getElementById('dreamVisual');
-    const palette = [
-        ['#7c3aed', '#22d3ee'],
-        ['#38bdf8', '#a78bfa'],
-        ['#f472b6', '#38bdf8'],
-        ['#facc15', '#38bdf8']
-    ];
-    const accent = palette[(foundSymbols.length + finalNumbers.length) % palette.length];
-    dreamVisual.innerHTML = `
-        <div class="dream-visual-badge">Future Dream</div>
-        <svg class="dream-visual-svg" viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <defs>
-                <linearGradient id="dreamAccent" x1="0" x2="1" y1="0" y2="1">
-                    <stop offset="0%" stop-color="${accent[0]}"/>
-                    <stop offset="100%" stop-color="${accent[1]}"/>
-                </linearGradient>
-                <radialGradient id="dreamCore" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="rgba(125,211,252,0.95)"/>
-                    <stop offset="100%" stop-color="rgba(15,23,42,0)"/>
-                </radialGradient>
-            </defs>
-            <rect x="6" y="6" width="228" height="168" rx="26" fill="rgba(15,23,42,0.92)" stroke="rgba(148,163,184,0.18)"/>
-            <circle cx="120" cy="86" r="44" fill="url(#dreamCore)" opacity="0.8"/>
-            <path d="M32 130 C72 62, 150 42, 208 82" stroke="url(#dreamAccent)" stroke-width="4" fill="none" stroke-linecap="round"/>
-            <path d="M44 96 C92 34, 170 30, 198 66" stroke="rgba(192,132,252,0.45)" stroke-width="2.5" fill="none" stroke-dasharray="6 6"/>
-            <g opacity="0.95">
-                <circle cx="68" cy="62" r="9" fill="${accent[0]}"/>
-                <circle cx="182" cy="48" r="7" fill="${accent[1]}"/>
-                <circle cx="150" cy="122" r="13" fill="rgba(125,211,252,0.85)"/>
-            </g>
-            <rect x="44" y="134" width="152" height="8" rx="4" fill="rgba(148,163,184,0.12)"/>
-            <rect x="54" y="147" width="92" height="6" rx="3" fill="rgba(56,189,248,0.35)"/>
-            <text x="50%" y="26" text-anchor="middle" fill="rgba(224,242,254,0.9)" font-size="11" font-family="Arial, sans-serif" letter-spacing="2">DIGITAL DREAM</text>
-        </svg>
-    `;
+    // ── 9. 드림 비주얼 (AI 카드 — 병렬 실행) ──
+    renderDreamVisual(foundSymbols, finalNumbers, text);
 
-    // --- Update Share Card ---
-    document.getElementById('shareTitle').innerText = text.split('\n')[0].substring(0, 20) + (text.length > 20 ? '...' : '');
-    document.getElementById('shareContent').innerText = text;
-    document.getElementById('shareCode').innerText = code;
-    
+    // ── 10. AI 해석 (스트리밍) ──
+    await fetchAIInterpretation(text, foundSymbols, { ascension, transform, power, luck });
+
+    // ── 11. 공유 카드 업데이트 ──
+    const firstLine = text.split('\n')[0];
+    document.getElementById('shareTitle').textContent = firstLine.substring(0, 20) + (firstLine.length > 20 ? '...' : '');
+    document.getElementById('shareContent').textContent = text;
+    document.getElementById('shareCode').textContent = code;
+
     const shareBallsArea = document.getElementById('shareBalls');
     shareBallsArea.innerHTML = '';
     finalNumbers.forEach(n => {
         const div = document.createElement('div');
         div.className = 'ball';
-        div.style.width = '48px';
-        div.style.height = '48px';
-        div.style.fontSize = '18px';
-        div.innerText = n;
+        div.style.cssText = 'width:48px; height:48px; font-size:18px; animation:none;';
+        div.textContent = n;
         shareBallsArea.appendChild(div);
     });
 
-    document.getElementById('shareCardContainer').style.display = 'block';
+    const shareContainer = document.getElementById('shareCardContainer');
+    shareContainer.style.display = 'block';
+    setTimeout(() => shareContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
 }
 
-function downloadResultImage() {
+/* ═══════════════════════════════════════
+   DOWNLOAD AS IMAGE
+   ═══════════════════════════════════════ */
+function downloadResultImage(){
     const card = document.getElementById('shareCard');
+    const btn  = document.getElementById('downloadBtn');
 
-    if (!window.html2canvas) {
-        alert('카드 저장 라이브러리를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    if(!window.html2canvas){
+        showToast('카드 저장 라이브러리를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
         return;
     }
+
+    btn.textContent = '⏳ 저장 중...';
+    btn.disabled = true;
 
     html2canvas(card, {
         backgroundColor: '#020617',
@@ -785,17 +1489,38 @@ function downloadResultImage() {
         useCORS: true
     }).then(canvas => {
         const link = document.createElement('a');
-        link.download = `oracle-card-${new Date().getTime()}.png`;
+        link.download = `dream-lotto-${Date.now()}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
+        showToast('✅ 이미지가 저장되었습니다!');
+    }).catch(() => {
+        showToast('저장 중 오류가 발생했습니다.');
+    }).finally(() => {
+        btn.textContent = '💾 이미지로 저장';
+        btn.disabled = false;
     });
 }
 
-function generateCode(found){
-    let code="";
-    found.forEach(f=>{ code += f.charCodeAt(0).toString(16); });
-    return "DRM-" + code.slice(0,8).toUpperCase();
-}
+/* ═══════════════════════════════════════
+   EVENT LISTENERS
+   ═══════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('dreamInput');
+    const analyzeBtn = document.getElementById('dreamAnalyzeBtn');
+    const dlBtn = document.getElementById('downloadBtn');
+
+    if(input && analyzeBtn){
+        analyzeBtn.addEventListener('click', analyzeDream);
+        input.addEventListener('keydown', (e) => {
+            if(e.key === 'Enter' && !e.shiftKey){
+                e.preventDefault();
+                analyzeDream();
+            }
+        });
+    }
+
+    if(dlBtn) dlBtn.addEventListener('click', downloadResultImage);
+});
 </script>
 
 </body>
